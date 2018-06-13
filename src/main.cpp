@@ -7,6 +7,8 @@
 #include "renderer/Window.hpp"
 #include "renderer/BulkText.hpp"
 #include "events/Input.hpp"
+#include "renderer/Object3D.hpp"
+#include "renderer/BulkObject3D.hpp"
 
 void update()
 {
@@ -55,6 +57,9 @@ int main(int argc, char* argv[])
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
+        auto wolf = new Renderer::Object3D("./data/mobs/wolf/Wolf_dae.dae");
+        Renderer::BulkObject3D::getInstance().push_back(wolf);
+
         auto loop = [&]() -> bool {
 
             auto start = SDL_GetTicks();
@@ -66,6 +71,7 @@ int main(int argc, char* argv[])
             update();
 
             Renderer::BulkText::getInstance().draw(window_default_size);
+            Renderer::BulkObject3D::getInstance().draw();
 
             auto quit = Events::Input::getInstance().HandleEvent();
             if (quit) return false;

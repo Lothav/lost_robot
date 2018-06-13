@@ -2,8 +2,8 @@
 // Created by luiz0tavio on 6/4/18.
 //
 
-#ifndef HEDGEHOG_CAMERA_HPP
-#define HEDGEHOG_CAMERA_HPP
+#ifndef MOONRAT_CAMERA_HPP
+#define MOONRAT_CAMERA_HPP
 
 #include <GL/glew.h>
 #include <iostream>
@@ -76,4 +76,4 @@ namespace Renderer
 
 
 
-#endif //HEDGEHOG_CAMERA_HPP
+#endif //MOONRAT_CAMERA_HPP

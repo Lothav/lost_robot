@@ -2,8 +2,8 @@
 // Created by luiz0tavio on 6/4/18.
 //
 
-#ifndef HEDGEHOG_INPUT_HPP
-#define HEDGEHOG_INPUT_HPP
+#ifndef MOONRAT_INPUT_HPP
+#define MOONRAT_INPUT_HPP
 
 #include <SDL2/SDL_events.h>
 #include "../renderer/Camera.hpp"
@@ -88,4 +88,4 @@ namespace Events
     };
 }
 
-#endif //HEDGEHOG_INPUT_HPP
+#endif //MOONRAT_INPUT_HPP

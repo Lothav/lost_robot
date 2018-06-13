@@ -35,6 +35,10 @@ add_executable(
         src/renderer/Camera.cpp
         src/renderer/Camera.hpp
         src/renderer/Object3D.cpp
-        src/renderer/Object3D.hpp)
+        src/renderer/Object3D.hpp
+        src/renderer/BulkObject3D.cpp
+        src/renderer/BulkObject3D.hpp
+
+)
 
 target_link_libraries(launcher SDL2 SDL2_image GL GLEW freetype assimp)

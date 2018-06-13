@@ -36,6 +36,7 @@ namespace Memory
             if ( T* p = (T *) malloc(size) ) return p;
 
             std::cerr << "ERR: Cannot get/alloc memory. Size: " << std::to_string(size) << "bytes." << std::endl;
+            return nullptr;
         }
 
         void deallocate(T* p, std::size_t) noexcept
