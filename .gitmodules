@@ -1,0 +1,6 @@
+[submodule "vendor/lib/freetype2"]
+	path = vendor/lib/freetype2
+	url = https://github.com/source-foundry/freetype2.git
+[submodule "vendor/include/assimp"]
+	path = vendor/include/assimp
+	url = https://github.com/assimp/assimp.git
