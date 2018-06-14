@@ -34,6 +34,16 @@ namespace Renderer
         std::vector<GLuint> textures_;
 
     public:
+        Object3D(const std::vector<Mesh> &meshes) {
+            for (const auto &m : meshes) {
+                auto meshObj = new Mesh{};
+                meshObj->vertices = m.vertices;
+                this->meshes_.push_back(meshObj);
+            }
+
+            glGenBuffers(1, &this->vbo_);
+        }
+
 
         Object3D(const std::string& file_path)
         {

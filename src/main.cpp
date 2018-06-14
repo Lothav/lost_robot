@@ -57,8 +57,23 @@ int main(int argc, char* argv[])
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
+
+        Mesh mesh;
+        mesh.vertices = {
+            {1.0f, 0.0f, 1.0f, 0.0f, 0.0f},
+            {1.0f, 0.0f, -1.0f, 0.0f, 0.0f},
+            {-1.0f, 0.0f, -1.0f, 0.0f, 0.0f},
+            {1.0f, 0.0f, 1.0f, 0.0f, 0.0f},
+            {-1.0f, 0.0f, -1.0f, 0.0f, 0.0f},
+            {-1.0f, 0.0f, 1.0f, 0.0f, 0.0f}
+        };
+        std::vector<Mesh> meshes;
+        meshes.push_back(mesh);
+        auto ground = new Renderer::Object3D(meshes);
+        Renderer::BulkObject3D::getInstance().push_back(ground);
+
         auto wolf = new Renderer::Object3D("./data/mobs/spider/with_texture.dae");
-        Renderer::BulkObject3D::getInstance().push_back(wolf);
+//        Renderer::BulkObject3D::getInstance().push_back(wolf);
 
          auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
 
