@@ -53,6 +53,7 @@ namespace Renderer
             if (pScene) {
 
                 if (pScene->HasMeshes()) {
+
                     for (int i = 0; i < pScene->mNumMeshes; i++) {
 
                         auto mesh = pScene->mMeshes[i];
@@ -61,10 +62,13 @@ namespace Renderer
                         meshObj->vertices = {};
                         meshObj->texture_index = mesh->mMaterialIndex;
 
-                        for (int j = 0; j < mesh->mNumVertices; j++) {
-                            auto vertex = mesh->mVertices[j];
-                            auto uv = mesh->mTextureCoords[0][j];
-                            meshObj->vertices.push_back({vertex.x, vertex.y, vertex.z, uv.x, uv.y});
+                        for (int k = 0; k < mesh->mNumFaces; k++) {
+                            auto face = mesh->mFaces[k];
+                            for (int j = 0; j < face.mNumIndices; ++j) {
+                                auto pos = mesh->mVertices[face.mIndices[j]];
+                                auto uv  = mesh->mTextureCoords[0][face.mIndices[j]];
+                                meshObj->vertices.push_back({pos.x, pos.y, pos.z, uv.x, uv.y});
+                            }
                         }
                         this->addMesh(meshObj);
                     }
@@ -75,7 +79,7 @@ namespace Renderer
                         aiString path;
                         auto material = pScene->mMaterials[i];
                         if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path)) {
-                            this->loadTexture(std::string("./data/mobs/spider/") + path.data, GL_RGBA);
+                            this->loadTexture(std::string("./data/mobs/spider/") + path.data, i== 1 ? GL_RGB : GL_RGBA);
                         }
                     }
                 }

@@ -69,7 +69,7 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
         for (auto mesh : meshes) {
 
             std::vector<GLfloat> vertices = {};
-            for (auto vertex : mesh->vertices){
+            for (auto vertex : mesh->vertices) {
                 for (auto vertex_element : vertex) {
                     vertices.push_back(vertex_element);
                 }
