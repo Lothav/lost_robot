@@ -35,16 +35,15 @@ namespace Renderer
             this->shader_view_pos_ = static_cast<GLuint>(loc);
 
             // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-            this->projection_ = glm::perspective(glm::radians(45.0f), (GLfloat)window_default_size[0] / (GLfloat)window_default_size[0], 0.1f, 100.0f);
+            this->projection_ = glm::perspective(glm::radians(45.0f), (GLfloat)window_default_size[0] / (GLfloat)window_default_size[1], 0.1f, 100.0f);
 
             this->view_ = glm::lookAt(
-
-                glm::vec3(0, 0, -20), // Camera is at (4,3,3), in World Space
-                glm::vec3(0, 0, 0), // and looks at the origin
-                glm::vec3(0, -1, 0) // Head is up (set to 0,-1,0 to look upside-down)
+                glm::vec3( 0,  0, -30 ), // Camera is at (4,3,3), in World Space
+                glm::vec3( 0,  0,   0 ), // and looks at the origin
+                glm::vec3( 0, -1,   0 )  // Head is up (set to 0,-1,0 to look upside-down)
             );
 
-            this->model_ = glm::mat4();
+            this->model_ = glm::mat4(1.f);
 
             this->updateMVP();
         }

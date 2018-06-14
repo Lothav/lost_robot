@@ -68,12 +68,19 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
 
         for (auto mesh : meshes) {
 
+            std::vector<GLfloat> vertices = {};
+            for (auto vertex : mesh->vertices){
+                for (auto vertex_element : vertex) {
+                    vertices.push_back(vertex_element);
+                }
+            }
+
             glActiveTexture(GL_TEXTURE0 + textures[mesh->texture_index]);
             glBindTexture(GL_TEXTURE_2D, textures[mesh->texture_index]);
             glUniform1i(this->shader_tex_pos_, textures[mesh->texture_index]);
 
-            glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(GLfloat), mesh->vertices.data(), GL_STATIC_DRAW);
-            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(mesh->vertices.size()));
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.size()));
         }
 
     }

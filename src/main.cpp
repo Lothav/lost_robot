@@ -54,13 +54,33 @@ int main(int argc, char* argv[])
         text_test->setText("Test Bottom Left");
         Renderer::BulkText::getInstance().push_back(text_test);
 
-        glAlphaFunc(GL_GREATER, 0.5);
-        glEnable(GL_ALPHA_TEST);
+        auto ground = new Renderer::Object3D();
+        ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
 
-        auto wolf = new Renderer::Object3D("./data/mobs/spider/with_texture.dae");
+        auto ground_mesh = new Mesh();
+        ground_mesh->texture_index = 0; // ground has only one texture.
+
+        ground_mesh->vertices = {};    //                                       //     c ___
+        ground_mesh->vertices.push_back({  10.0f,  10.0f, .0f, 1.0f, 0.0f });   // a    |  /a
+        ground_mesh->vertices.push_back({ -10.0f, -10.0f, .0f, 0.0f, 1.0f });   // b    | /
+        ground_mesh->vertices.push_back({ -10.0f,  10.0f, .0f, 0.0f, 0.0f });   // c   b|/
+
+        ground_mesh->vertices.push_back({  10.0f,  10.0f, .0f, 1.0f, 0.0f });   // d       /|d
+        ground_mesh->vertices.push_back({ -10.0f, -10.0f, .0f, 0.0f, 1.0f });   // e      / |
+        ground_mesh->vertices.push_back({  10.0f, -10.0f, .0f, 1.0f, 1.0f });   // f    e/__|f
+
+        ground->addMesh(ground_mesh);
+
+        Renderer::BulkObject3D::getInstance().push_back(ground);
+
+        auto wolf = new Renderer::Object3D();
+        wolf->importFromFile("./data/mobs/spider/with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(wolf);
 
-         auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
+        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
+
+        glAlphaFunc(GL_GREATER, 0.5);
+        glEnable(GL_ALPHA_TEST);
 
         auto loop = [&]() -> bool {
 
