@@ -56,8 +56,7 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
 
     for (const auto &object3D : objects3d_) {
 
-        //camera->update(object3D->getFixed());
-        camera->update(false);
+        camera->update();
 
         GLsizei stride = 5 * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, object3D->getVBO());
@@ -65,12 +64,13 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
         glVertexAttribPointer(this->shader_uv_pos_, 2, GL_FLOAT, GL_TRUE, stride, (const GLvoid*)(3 * sizeof(GLfloat)));
 
         auto meshes = object3D->getMeshes();
+        auto textures = object3D->getTextures();
 
         for (auto mesh : meshes) {
 
-            glActiveTexture(GL_TEXTURE0 + mesh->texture_index + 1);
-            glBindTexture(GL_TEXTURE_2D, mesh->texture_index + 1);
-            glUniform1i(this->shader_tex_pos_, mesh->texture_index);
+            glActiveTexture(GL_TEXTURE0 + textures[mesh->texture_index]);
+            glBindTexture(GL_TEXTURE_2D, textures[mesh->texture_index]);
+            glUniform1i(this->shader_tex_pos_, textures[mesh->texture_index]);
 
             glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(GLfloat), mesh->vertices.data(), GL_STATIC_DRAW);
             glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(mesh->vertices.size()));

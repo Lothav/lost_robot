@@ -49,14 +49,9 @@ namespace Renderer
             this->updateMVP();
         }
 
-        void update(bool fixed)
+        void update()
         {
-            if (fixed) {
-                auto fixed_cam = glm::mat4();
-                glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &fixed_cam[0][0]);
-            } else {
-                glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &this->mvp_[0][0]);
-            }
+            glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &this->mvp_[0][0]);
         }
 
         void move(glm::vec3 direction)

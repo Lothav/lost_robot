@@ -31,6 +31,7 @@ namespace Renderer
 
         std::vector<Mesh *> meshes_;
         GLuint vbo_;
+        std::vector<GLuint> textures_;
 
     public:
 
@@ -46,12 +47,10 @@ namespace Renderer
 
                         auto mesh = pScene->mMeshes[i];
 
-                        std::cout << "Channels: " << std::to_string(mesh->GetNumUVChannels()) << std::endl;
-                       // std::cout << std::to_string(mesh->mNumUVComponents) << std::endl;
-
                         auto meshObj = new Mesh{};
                         meshObj->vertices = {};
                         meshObj->texture_index = mesh->mMaterialIndex;
+
                         for (int j = 0; j < mesh->mNumVertices; j++) {
                             auto vertex = mesh->mVertices[j];
                             auto uv = mesh->mTextureCoords[0][j];
@@ -82,11 +81,18 @@ namespace Renderer
         {
             SDL_Surface* surf = IMG_Load(path.c_str());
 
+            if (surf == nullptr) {
+                std::cerr << "Err loading texture file: " << path << std::endl;
+                return;
+            }
+
             GLuint id;
             glGenTextures(1, &id);
             glBindTexture(GL_TEXTURE_2D, id);
             glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, surf->w, surf->h);
             glTexSubImage2D(GL_TEXTURE_2D, 0, 0 ,0, surf->w, surf->h, format, GL_UNSIGNED_BYTE, surf->pixels);
+
+            textures_.push_back(id);
 
             std::cout << std::to_string(id) << std::endl;
 
@@ -98,6 +104,11 @@ namespace Renderer
             }
 
             glGenerateMipmap(GL_TEXTURE_2D);
+        }
+
+        std::vector<GLuint> getTextures() const
+        {
+            return this->textures_;
         }
 
         std::vector<Mesh *> getMeshes() const

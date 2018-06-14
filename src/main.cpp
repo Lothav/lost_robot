@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
-        auto wolf = new Renderer::Object3D("./data/mobs/spider/test2.dae");
+        auto wolf = new Renderer::Object3D("./data/mobs/spider/with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(wolf);
 
          auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
@@ -68,8 +68,7 @@ int main(int argc, char* argv[])
 
             // Set screen to black
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+            glClear(GL_COLOR_BUFFER_BIT);
 
             update();
             Renderer::BulkText::getInstance().draw(window_default_size);
