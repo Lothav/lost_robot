@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
-        auto wolf = new Renderer::Object3D("./data/mobs/wolf/Wolf_dae.dae");
+        auto wolf = new Renderer::Object3D("./data/mobs/spider/test2.dae");
         Renderer::BulkObject3D::getInstance().push_back(wolf);
 
          auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);

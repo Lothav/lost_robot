@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8.4)
 project(moonrat)
 
-add_subdirectory(vendor/include/assimp ../vendor/include/assimp)
+add_subdirectory(vendor/include/assimp ../vendor/include/assimp/build)
+include_directories(vendor/include/assimp/build)
 include_directories(vendor/include/assimp/include)
 include_directories(vendor/include/assimp/code)
 

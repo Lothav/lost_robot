@@ -23,17 +23,17 @@ Renderer::BulkObject3D::BulkObject3D() : objects3d_({}), shader_(nullptr)
     this->shader_->createGraphicShader(GL_FRAGMENT_SHADER, "default.frag");
     this->shader_->link();
 
-    //auto loc = glGetUniformLocation(this->shader_->getShaderProgram(), "tex");
-    //if (loc < 0) std::cerr << "Can't find 'tex' uniform on shader!" << std::endl;
-    //this->shader_tex_pos_ = static_cast<GLuint>(loc);
+    auto loc = glGetUniformLocation(this->shader_->getShaderProgram(), "tex");
+    if (loc < 0) std::cerr << "Can't find 'tex' uniform on shader!" << std::endl;
+    this->shader_tex_pos_ = static_cast<GLuint>(loc);
 
-    auto loc = glGetAttribLocation(this->shader_->getShaderProgram(), "vert");
+    loc = glGetAttribLocation(this->shader_->getShaderProgram(), "vert");
     if (loc < 0) std::cerr << "Error find location 'vert' Attribute shader!" << std::endl;
     this->shader_vert_pos_ = static_cast<GLuint>(loc);
 
-    //loc = glGetAttribLocation(this->shader_->getShaderProgram(), "vertTexCoord");
-    //if (loc < 0) std::cerr << "Error find location 'vertTexCoord' Attribute shader!" << std::endl;
-    //this->shader_uv_pos_ = static_cast<GLuint>(loc);
+    loc = glGetAttribLocation(this->shader_->getShaderProgram(), "vertTexCoord");
+    if (loc < 0) std::cerr << "Error find location 'vertTexCoord' Attribute shader!" << std::endl;
+    this->shader_uv_pos_ = static_cast<GLuint>(loc);
 }
 
 void Renderer::BulkObject3D::push_back(Object3D* Object3D)
@@ -59,19 +59,19 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
         //camera->update(object3D->getFixed());
         camera->update(false);
 
-        GLsizei stride = 3 * sizeof(GLfloat);
+        GLsizei stride = 5 * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, object3D->getVBO());
         glVertexAttribPointer(this->shader_vert_pos_, 3, GL_FLOAT, GL_TRUE, stride, nullptr);
-        //glVertexAttribPointer(this->shader_uv_pos_, 2, GL_FLOAT, GL_TRUE, stride, (const GLvoid*)(3 * sizeof(GLfloat)));
-
-        //auto texture_id = object3D->getTextureId();
-        //glActiveTexture(GL_TEXTURE0 + texture_id);
-        //glBindTexture(GL_TEXTURE_2D, texture_id);
-        //glUniform1i(this->shader_tex_pos_, texture_id);
+        glVertexAttribPointer(this->shader_uv_pos_, 2, GL_FLOAT, GL_TRUE, stride, (const GLvoid*)(3 * sizeof(GLfloat)));
 
         auto meshes = object3D->getMeshes();
 
         for (auto mesh : meshes) {
+
+            glActiveTexture(GL_TEXTURE0 + mesh->texture_index + 1);
+            glBindTexture(GL_TEXTURE_2D, mesh->texture_index + 1);
+            glUniform1i(this->shader_tex_pos_, mesh->texture_index);
+
             glBufferData(GL_ARRAY_BUFFER, mesh->vertices.size() * sizeof(GLfloat), mesh->vertices.data(), GL_STATIC_DRAW);
             glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(mesh->vertices.size()));
         }

@@ -26,10 +26,6 @@ namespace Renderer
 
         GLuint shader_view_pos_;
 
-        float alpha = .5f;
-        float beta_ = .4f;
-        float gamma = .8f;
-
     public:
 
         Camera(GLuint shader_program, std::array<int, 2> window_default_size) : shader_view_pos_(0)
@@ -43,23 +39,12 @@ namespace Renderer
 
             this->view_ = glm::lookAt(
 
-                glm::vec3(0, 0, 4), // Camera is at (4,3,3), in World Space
+                glm::vec3(0, 0, -20), // Camera is at (4,3,3), in World Space
                 glm::vec3(0, 0, 0), // and looks at the origin
-                glm::vec3(0, 1, 0) // Head is up (set to 0,-1,0 to look upside-down)
+                glm::vec3(0, -1, 0) // Head is up (set to 0,-1,0 to look upside-down)
             );
 
-            this->model_ = (
-                glm::rotate(
-                    glm::rotate(
-                        glm::rotate(
-                            glm::mat4(1.f),
-                            (float) M_PI * alpha, glm::vec3(0.0f, 0.0f, 1.0f)
-                        ),
-                        (float) M_PI * beta_, glm::vec3(0.0f, 1.0f, 0.0f)
-                    ),
-                    (float) M_PI * gamma, glm::vec3(0.0f, 0.0f, 1.0f)
-                )
-            );
+            this->model_ = glm::mat4();
 
             this->updateMVP();
         }
