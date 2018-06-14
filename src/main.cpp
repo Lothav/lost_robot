@@ -60,6 +60,8 @@ int main(int argc, char* argv[])
         auto wolf = new Renderer::Object3D("./data/mobs/wolf/Wolf_dae.dae");
         Renderer::BulkObject3D::getInstance().push_back(wolf);
 
+         auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
+
         auto loop = [&]() -> bool {
 
             auto start = SDL_GetTicks();
@@ -68,12 +70,12 @@ int main(int argc, char* argv[])
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
             update();
-
             Renderer::BulkText::getInstance().draw(window_default_size);
-            Renderer::BulkObject3D::getInstance().draw();
+            Renderer::BulkObject3D::getInstance().draw(camera);
 
-            auto quit = Events::Input::getInstance().HandleEvent();
+            auto quit = Events::Input::getInstance().HandleEvent(camera);
             if (quit) return false;
 
             // Swap Window

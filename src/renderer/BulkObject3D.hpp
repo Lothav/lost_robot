@@ -41,8 +41,12 @@ namespace Renderer
 
         void push_back(Object3D* Object3D);
 
-        void draw();
+        void draw(Renderer::Camera* camera);
 
+        GLuint GetShaderProgram()
+        {
+            return this->shader_->getShaderProgram();
+        }
     };
 }
 

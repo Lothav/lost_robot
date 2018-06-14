@@ -41,7 +41,7 @@ void Renderer::BulkObject3D::push_back(Object3D* Object3D)
     this->objects3d_.push_back(Object3D);
 }
 
-void Renderer::BulkObject3D::draw()
+void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
 {
     this->shader_->use();
 
@@ -55,6 +55,9 @@ void Renderer::BulkObject3D::draw()
     glEnableVertexAttribArray(this->shader_uv_pos_);
 
     for (const auto &object3D : objects3d_) {
+
+        //camera->update(object3D->getFixed());
+        camera->update(false);
 
         GLsizei stride = 3 * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, object3D->getVBO());

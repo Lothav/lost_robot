@@ -11,5 +11,5 @@ out vec2 coord;
 void main() {
     // Pass the tex coord straight through to the fragment shader
     fragTexCoord = vertTexCoord;
-    gl_Position = vec4(vert, 1.0f);
+    gl_Position = mvp * vec4(vert, 1.0f);
 }
