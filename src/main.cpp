@@ -55,19 +55,19 @@ int main(int argc, char *argv[]) {
         auto ground = new Renderer::Object3D();
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
 
-        int size = 20;
+        int groundScale = 1;
 
-        auto ground_mesh = new Mesh();
-        ground_mesh->texture_index = 0;
-        ground_mesh->vertices = {};
-        ground_mesh->vertices.push_back({1.0f * size, .0f, 1.0f * size, 1.0f, 0.0f});
-        ground_mesh->vertices.push_back({-1.0f * size, .0f, -1.0f * size, 0.0f, 1.0f});
-        ground_mesh->vertices.push_back({-1.0f * size, .0f, 1.0f * size, 0.0f, 0.0f});
-        ground_mesh->vertices.push_back({1.0f * size, .0f, 1.0f * size, 1.0f, 0.0f});
-        ground_mesh->vertices.push_back({-1.0f * size, .0f, -1.0f * size, 0.0f, 1.0f});
-        ground_mesh->vertices.push_back({1.0f * size, .0f, -1.0f * size, 1.0f, 1.0f});
+        auto groundMesh = new Mesh();
+        groundMesh->texture_index = 0;
+        groundMesh->vertices = {};
+        groundMesh->vertices.push_back({1.0f * groundScale, 1.0f * groundScale, .0f, 1.0f, 0.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale, 1.0f * groundScale, .0f, 0.0f, 0.0f});
+        groundMesh->vertices.push_back({1.0f * groundScale, 1.0f * groundScale, .0f, 1.0f, 0.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
+        groundMesh->vertices.push_back({1.0f * groundScale, -1.0f * groundScale, .0f, 1.0f, 1.0f});
 
-        ground->addMesh(ground_mesh);
+        ground->addMesh(groundMesh);
 
         Renderer::BulkObject3D::getInstance().push_back(ground);
 
@@ -75,21 +75,7 @@ int main(int argc, char *argv[]) {
                                            window_default_size);
 
         auto wolf = new Renderer::Object3D();
-        wolf->setModelMatrix(
-            glm::rotate(
-                glm::rotate(
-                    glm::rotate(
-                        glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)),
-                        glm::radians(90.0f),
-                        glm::vec3(1.0f, 0.0f, 0.f)
-                    ),
-                    glm::radians(180.0f),
-                    glm::vec3(0.0f, 1.0f, 0.f)
-                ),
-                glm::radians(270.0f),
-                glm::vec3(0.0f, 0.0f, 1.f)
-            )
-        );
+        wolf->setModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
         wolf->importFromFile("./data/mobs/spider/with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(wolf);
 
@@ -97,15 +83,26 @@ int main(int argc, char *argv[]) {
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
-        auto loop = [&]() -> bool {
+        struct {
+            int x, y;
+        } mousePos = {0, 0};
 
+        auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
+
+            SDL_GetMouseState(&mousePos.x, &mousePos.y);
+
+            camera->mouse(
+                    ((float) mousePos.x) / window_default_size[0],
+                    ((float) mousePos.y) / window_default_size[1]
+            );
 
             // Set screen to black
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
             update();
+
             Renderer::BulkText::getInstance().draw(window_default_size);
             Renderer::BulkObject3D::getInstance().draw(camera);
 

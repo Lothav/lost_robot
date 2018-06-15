@@ -22,13 +22,15 @@ namespace Renderer
         glm::mat4 mvp_;
 
         glm::mat4 model_;
+        glm::mat4 objectModel_;
         glm::mat4 view_;
         glm::mat4 projection_;
+        glm::vec3 center_;
+        glm::vec3 origin_;
 
         GLuint shader_view_pos_;
 
     public:
-
         Camera(GLuint shader_program, std::array<int, 2> window_default_size) : shader_view_pos_(0)
         {
             auto loc = glGetUniformLocation(shader_program, "mvp");
@@ -38,27 +40,39 @@ namespace Renderer
             // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
             this->projection_ = glm::perspective(glm::radians(45.0f), (GLfloat)window_default_size[0] / (GLfloat)window_default_size[1], 0.1f, 100.0f);
 
+            this->center_ = glm::vec3( 0,  0, 2 );
+            this->origin_ = glm::vec3( 0,  0,   0 );
+
             this->view_ = glm::lookAt(
-                glm::vec3( 4,  3, 3 ), // Camera is at (4,3,3), in World Space
-                glm::vec3( 0,  0,   0 ), // and looks at the origin
+                this->center_, // Camera is at (4,3,3), in World Space
+                this->origin_, // and looks at the origin
                 glm::vec3( 0, 1,   0 )  // Head is up (set to 0,-1,0 to look upside-down)
             );
 
             this->model_ = glm::mat4(1.f);
+            this->objectModel_ = glm::mat4(1.f);
 
             this->updateMVP();
         }
 
         void update(Renderer::Object3D *object)
         {
-            this->model_ = object->getModelMatrix();
+            this->objectModel_ = object->getModelMatrix();
             this->updateMVP();
             glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &this->mvp_[0][0]);
+        }
+
+        void mouse(float x, float y) {
+            this->model_ = glm::rotate(glm::mat4(1.0f), glm::radians((0.5f - x) * 180), glm::vec3(0.0f, 1.0f, 0.0f));
+            this->model_ = glm::rotate(this->model_, glm::radians((0.5f - y) * 180), glm::vec3(1.0f, 0.0f, 0.0f));
+
+            this->updateMVP();
         }
 
         void move(glm::vec3 direction)
         {
             this->view_ = glm::translate(this->view_, direction);
+
             this->updateMVP();
         }
 
@@ -66,7 +80,7 @@ namespace Renderer
 
         void updateMVP()
         {
-            this->mvp_ = this->projection_ * this->view_ * this->model_;
+            this->mvp_ = this->projection_ * this->view_ * this->model_ * this->objectModel_;
         }
 
     };
