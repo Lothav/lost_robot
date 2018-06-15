@@ -26,7 +26,7 @@ namespace Events
 
     public:
 
-        bool HandleEvent(Renderer::Camera* camera, std::vector<Renderer::Object3D *, Memory::Allocator<Renderer::Object3D *>> objects) const
+        bool HandleEvent(Renderer::Camera* camera) const
         {
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
@@ -37,13 +37,7 @@ namespace Events
 
                 int mouse_pos_x, mouse_pos_y;
                 SDL_GetMouseState(&mouse_pos_x, &mouse_pos_y);
-
-                for (auto object: objects) {
-                    object->rotate(
-                        static_cast<GLfloat>(mouse_pos_x) / camera->getWindowSize()[0],
-                        static_cast<GLfloat>(mouse_pos_y) / camera->getWindowSize()[1]);
-                }
-
+                camera->rotate(mouse_pos_x, mouse_pos_y);
 
                 // Restart if hit 'r'
                 if (e.type == SDL_KEYDOWN) {

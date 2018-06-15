@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
-        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
-        text_test->setText("Test Bottom Left");
-        Renderer::BulkText::getInstance().push_back(text_test);
+//        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
+//        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
+//        text_test->setText("Test Bottom Left");
+//        Renderer::BulkText::getInstance().push_back(text_test);
 
         auto ground = new Renderer::Object3D();
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
@@ -93,9 +93,7 @@ int main(int argc, char *argv[]) {
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
 
-            auto objects = Renderer::BulkObject3D::getInstance().getObjects();
-
-            auto quit = Events::Input::getInstance().HandleEvent(camera, objects);
+            auto quit = Events::Input::getInstance().HandleEvent(camera);
             if (quit) return false;
 
             // Swap Window

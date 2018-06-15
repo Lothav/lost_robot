@@ -95,14 +95,8 @@ namespace Renderer {
             } else {
                 printf("Error parsing '%s': '%s'\n", source_path + file_name, Importer.GetErrorString());
             }
-
         }
 
-        void rotate(float x, float y)
-        {
-            this->model_ = glm::rotate(this->model_, glm::radians(x), glm::vec3(0.0f, 1.0f, 0.0f));
-            this->model_ = glm::rotate(this->model_, glm::radians(y), glm::vec3(1.0f, 0.0f, 0.0f));
-        }
 
         void loadTexture(const std::string &path, const GLenum format) {
             SDL_Surface *surf = IMG_Load(path.c_str());
