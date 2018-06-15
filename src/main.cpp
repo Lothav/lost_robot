@@ -10,13 +10,11 @@
 #include "renderer/Object3D.hpp"
 #include "renderer/BulkObject3D.hpp"
 
-void update()
-{
+void update() {
 
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
     Memory::Provider::initPools();
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -49,7 +47,7 @@ int main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        GLfloat white_color[4] {1.f, 1.f, 1.f, 1.f};
+        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
         auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
         text_test->setText("Test Bottom Left");
         Renderer::BulkText::getInstance().push_back(text_test);
@@ -57,27 +55,44 @@ int main(int argc, char* argv[])
         auto ground = new Renderer::Object3D();
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
 
+        int size = 20;
+
         auto ground_mesh = new Mesh();
-        ground_mesh->texture_index = 0; // ground has only one texture.
-
-        ground_mesh->vertices = {};    //                                       //     c ___
-        ground_mesh->vertices.push_back({  10.0f,  10.0f, .0f, 1.0f, 0.0f });   // a    |  /a
-        ground_mesh->vertices.push_back({ -10.0f, -10.0f, .0f, 0.0f, 1.0f });   // b    | /
-        ground_mesh->vertices.push_back({ -10.0f,  10.0f, .0f, 0.0f, 0.0f });   // c   b|/
-
-        ground_mesh->vertices.push_back({  10.0f,  10.0f, .0f, 1.0f, 0.0f });   // d       /|d
-        ground_mesh->vertices.push_back({ -10.0f, -10.0f, .0f, 0.0f, 1.0f });   // e      / |
-        ground_mesh->vertices.push_back({  10.0f, -10.0f, .0f, 1.0f, 1.0f });   // f    e/__|f
+        ground_mesh->texture_index = 0;
+        ground_mesh->vertices = {};
+        ground_mesh->vertices.push_back({1.0f * size, .0f, 1.0f * size, 1.0f, 0.0f});
+        ground_mesh->vertices.push_back({-1.0f * size, .0f, -1.0f * size, 0.0f, 1.0f});
+        ground_mesh->vertices.push_back({-1.0f * size, .0f, 1.0f * size, 0.0f, 0.0f});
+        ground_mesh->vertices.push_back({1.0f * size, .0f, 1.0f * size, 1.0f, 0.0f});
+        ground_mesh->vertices.push_back({-1.0f * size, .0f, -1.0f * size, 0.0f, 1.0f});
+        ground_mesh->vertices.push_back({1.0f * size, .0f, -1.0f * size, 1.0f, 1.0f});
 
         ground->addMesh(ground_mesh);
 
         Renderer::BulkObject3D::getInstance().push_back(ground);
 
+        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(),
+                                           window_default_size);
+
         auto wolf = new Renderer::Object3D();
+        wolf->setModelMatrix(
+            glm::rotate(
+                glm::rotate(
+                    glm::rotate(
+                        glm::scale(glm::mat4(1.0f), glm::vec3(0.1f)),
+                        glm::radians(90.0f),
+                        glm::vec3(1.0f, 0.0f, 0.f)
+                    ),
+                    glm::radians(180.0f),
+                    glm::vec3(0.0f, 1.0f, 0.f)
+                ),
+                glm::radians(270.0f),
+                glm::vec3(0.0f, 0.0f, 1.f)
+            )
+        );
         wolf->importFromFile("./data/mobs/spider/with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(wolf);
 
-        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
@@ -101,14 +116,14 @@ int main(int argc, char* argv[])
             SDL_GL_SwapWindow(window->getWindow());
 
             // Adjust FPS
-            if (1000/60 > (SDL_GetTicks() - start)) {
-                SDL_Delay(1000/60 - (SDL_GetTicks() - start));
+            if (1000 / 60 > (SDL_GetTicks() - start)) {
+                SDL_Delay(1000 / 60 - (SDL_GetTicks() - start));
             }
 
             return true;
         };
 
-        while(loop());
+        while (loop());
 
         SDL_GL_DeleteContext(mainContext);
     }

@@ -16,39 +16,38 @@
 #include <iostream>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_image.h>
+#include <glm/glm.hpp>
 
 struct Mesh {
     std::vector<std::array<GLfloat, 5>> vertices;
     GLuint texture_index;
 };
 
-namespace Renderer
-{
-    class Object3D
-    {
+namespace Renderer {
+    class Object3D {
 
     private:
 
         std::vector<Mesh *> meshes_;
         GLuint vbo_;
         std::vector<GLuint> textures_;
+        glm::mat4 modelMatrix;
 
     public:
 
-        Object3D()
-        {
+        Object3D() : modelMatrix(glm::mat4(1.0f)) {
             glGenBuffers(1, &this->vbo_);
         }
 
-        void addMesh(Mesh* mesh)
-        {
+        void addMesh(Mesh *mesh) {
             this->meshes_.push_back(mesh);
         }
 
-        void importFromFile(const std::string& file_path)
-        {
+        void importFromFile(const std::string &file_path) {
             Assimp::Importer Importer;
-            const aiScene *pScene = Importer.ReadFile(file_path.c_str(), aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+            const aiScene *pScene = Importer.ReadFile(file_path.c_str(),
+                                                      aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+                                                      aiProcess_FlipUVs);
 
             if (pScene) {
 
@@ -90,9 +89,8 @@ namespace Renderer
 
         }
 
-        void loadTexture(const std::string& path, const GLenum format)
-        {
-            SDL_Surface* surf = IMG_Load(path.c_str());
+        void loadTexture(const std::string &path, const GLenum format) {
+            SDL_Surface *surf = IMG_Load(path.c_str());
 
             if (surf == nullptr) {
                 std::cerr << "Err loading texture file: " << path << std::endl;
@@ -103,7 +101,7 @@ namespace Renderer
             glGenTextures(1, &id);
             glBindTexture(GL_TEXTURE_2D, id);
             glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, surf->w, surf->h);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0 ,0, surf->w, surf->h, format, GL_UNSIGNED_BYTE, surf->pixels);
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surf->w, surf->h, format, GL_UNSIGNED_BYTE, surf->pixels);
 
             this->textures_.push_back(id);
 
@@ -117,18 +115,23 @@ namespace Renderer
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
-        std::vector<GLuint> getTextures() const
-        {
+        std::vector<GLuint> getTextures() const {
             return this->textures_;
         }
 
-        std::vector<Mesh *> getMeshes() const
-        {
+        std::vector<Mesh *> getMeshes() const {
             return this->meshes_;
         }
 
-        GLuint getVBO() const
-        {
+        void setModelMatrix(glm::mat4 view) {
+            this->modelMatrix = view;
+        }
+
+        glm::mat4 getModelMatrix() {
+            return this->modelMatrix;
+        }
+
+        GLuint getVBO() const {
             return this->vbo_;
         }
 

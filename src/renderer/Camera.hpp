@@ -10,6 +10,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <array>
+#include "Object3D.hpp"
 
 namespace Renderer
 {
@@ -38,9 +39,9 @@ namespace Renderer
             this->projection_ = glm::perspective(glm::radians(45.0f), (GLfloat)window_default_size[0] / (GLfloat)window_default_size[1], 0.1f, 100.0f);
 
             this->view_ = glm::lookAt(
-                glm::vec3( 0,  0, -30 ), // Camera is at (4,3,3), in World Space
+                glm::vec3( 4,  3, 3 ), // Camera is at (4,3,3), in World Space
                 glm::vec3( 0,  0,   0 ), // and looks at the origin
-                glm::vec3( 0, -1,   0 )  // Head is up (set to 0,-1,0 to look upside-down)
+                glm::vec3( 0, 1,   0 )  // Head is up (set to 0,-1,0 to look upside-down)
             );
 
             this->model_ = glm::mat4(1.f);
@@ -48,8 +49,10 @@ namespace Renderer
             this->updateMVP();
         }
 
-        void update()
+        void update(Renderer::Object3D *object)
         {
+            this->model_ = object->getModelMatrix();
+            this->updateMVP();
             glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &this->mvp_[0][0]);
         }
 

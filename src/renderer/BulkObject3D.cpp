@@ -56,7 +56,7 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
 
     for (const auto &object3D : objects3d_) {
 
-        camera->update();
+        camera->update(object3D);
 
         GLsizei stride = 5 * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, object3D->getVBO());
