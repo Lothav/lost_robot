@@ -60,7 +60,7 @@ GLuint Renderer::BulkText::getShaderProgram()
     return this->shader_->getShaderProgram();
 }
 
-void Renderer::BulkText::draw(std::array<int, 2> window_size)
+void Renderer::BulkText::draw(Renderer::Camera* camera)
 {
     // Init Text Shader
     this->shader_->use();
@@ -106,8 +106,8 @@ void Renderer::BulkText::draw(std::array<int, 2> window_size)
         auto x_tmp = text->getX();
         auto y_tmp = text->getY();
 
-        float sx = 2.0f / window_size[0];
-        float sy = 2.0f / window_size[1];
+        float sx = 2.0f / camera->getWindowSize()[0];
+        float sy = 2.0f / camera->getWindowSize()[1];
 
         /* Loop through all characters */
         for (char i : text->getText()) {

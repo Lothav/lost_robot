@@ -17,6 +17,7 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
 struct Mesh {
     std::vector<std::array<GLfloat, 5>> vertices;
@@ -31,11 +32,11 @@ namespace Renderer {
         std::vector<Mesh *> meshes_;
         GLuint vbo_;
         std::vector<GLuint> textures_;
-        glm::mat4 modelMatrix;
+        glm::mat4 model_;
 
     public:
 
-        Object3D() : modelMatrix(glm::mat4(1.0f)) {
+        Object3D() : model_(glm::mat4(1.0f)) {
             glGenBuffers(1, &this->vbo_);
         }
 
@@ -97,6 +98,12 @@ namespace Renderer {
 
         }
 
+        void rotate(float x, float y)
+        {
+            this->model_ = glm::rotate(this->model_, glm::radians(x), glm::vec3(0.0f, 1.0f, 0.0f));
+            this->model_ = glm::rotate(this->model_, glm::radians(y), glm::vec3(1.0f, 0.0f, 0.0f));
+        }
+
         void loadTexture(const std::string &path, const GLenum format) {
             SDL_Surface *surf = IMG_Load(path.c_str());
 
@@ -131,12 +138,12 @@ namespace Renderer {
             return this->meshes_;
         }
 
-        void setModelMatrix(glm::mat4 view) {
-            this->modelMatrix = view;
+        void transform(glm::mat4 model) {
+            this->model_ = model;
         }
 
         glm::mat4 getModelMatrix() {
-            return this->modelMatrix;
+            return this->model_;
         }
 
         GLuint getVBO() const {

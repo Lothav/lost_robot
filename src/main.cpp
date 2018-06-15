@@ -71,30 +71,18 @@ int main(int argc, char *argv[]) {
 
         Renderer::BulkObject3D::getInstance().push_back(ground);
 
-        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(),
-                                           window_default_size);
+        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
 
         auto spider = new Renderer::Object3D();
-        spider->setModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
+        spider->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
         spider->importFromFile("./data/mobs/spider/", "with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(spider);
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
-        struct {
-            int x, y;
-        } mousePos = {0, 0};
-
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
-
-            SDL_GetMouseState(&mousePos.x, &mousePos.y);
-
-            camera->mouse(
-                    ((float) mousePos.x) / window_default_size[0],
-                    ((float) mousePos.y) / window_default_size[1]
-            );
 
             // Set screen to black
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -102,10 +90,12 @@ int main(int argc, char *argv[]) {
 
             update();
 
-            Renderer::BulkText::getInstance().draw(window_default_size);
+            Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
 
-            auto quit = Events::Input::getInstance().HandleEvent(camera);
+            auto objects = Renderer::BulkObject3D::getInstance().getObjects();
+
+            auto quit = Events::Input::getInstance().HandleEvent(camera, objects);
             if (quit) return false;
 
             // Swap Window

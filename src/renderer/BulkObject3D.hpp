@@ -47,6 +47,11 @@ namespace Renderer
         {
             return this->shader_->getShaderProgram();
         }
+
+        std::vector<Object3D *, Memory::Allocator<Object3D *> > getObjects()
+        {
+            return this->objects3d_;
+        }
     };
 }
 

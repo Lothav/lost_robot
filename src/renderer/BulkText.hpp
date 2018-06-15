@@ -8,6 +8,7 @@
 #include <vector>
 #include "Text.hpp"
 #include "Shader.hpp"
+#include "Camera.hpp"
 
 namespace Renderer {
 
@@ -42,7 +43,7 @@ namespace Renderer {
 
         void push_back(Text* text);
 
-        void draw(std::array<int, 2> window_size);
+        void draw(Renderer::Camera* camera);
 
         GLuint getShaderProgram();
 
