@@ -43,11 +43,10 @@ namespace Renderer {
             this->meshes_.push_back(mesh);
         }
 
-        void importFromFile(const std::string &file_path) {
+        void importFromFile(const std::string &source_path, const std::string &file_name) {
             Assimp::Importer Importer;
-            const aiScene *pScene = Importer.ReadFile(file_path.c_str(),
-                                                      aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                                                      aiProcess_FlipUVs);
+            const aiScene *pScene = Importer.ReadFile(
+                    source_path + file_name, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
 
             if (pScene) {
 
@@ -77,14 +76,23 @@ namespace Renderer {
                     for (int i = 0; i < pScene->mNumMaterials; i++) {
                         aiString path;
                         auto material = pScene->mMaterials[i];
+
                         if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path)) {
-                            this->loadTexture(std::string("./data/mobs/spider/") + path.data, i== 1 ? GL_RGB : GL_RGBA);
+
+                            GLuint texture_format = GL_RGB;
+
+                            std::string texture_file_name = path.data;
+                            if ((texture_file_name.substr( texture_file_name.length() - 3)) == "png") {
+                                texture_format = GL_RGBA;
+                            }
+
+                            this->loadTexture(source_path + path.data, texture_format);
                         }
                     }
                 }
 
             } else {
-                printf("Error parsing '%s': '%s'\n", file_path.c_str(), Importer.GetErrorString());
+                printf("Error parsing '%s': '%s'\n", source_path + file_name, Importer.GetErrorString());
             }
 
         }

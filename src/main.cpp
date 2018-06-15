@@ -74,11 +74,10 @@ int main(int argc, char *argv[]) {
         auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(),
                                            window_default_size);
 
-        auto wolf = new Renderer::Object3D();
-        wolf->setModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        wolf->importFromFile("./data/mobs/spider/with_texture.dae");
-        Renderer::BulkObject3D::getInstance().push_back(wolf);
-
+        auto spider = new Renderer::Object3D();
+        spider->setModelMatrix(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
+        spider->importFromFile("./data/mobs/spider/", "with_texture.dae");
+        Renderer::BulkObject3D::getInstance().push_back(spider);
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
