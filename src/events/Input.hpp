@@ -25,11 +25,13 @@ namespace Events
 
         Input() {}
 
-        std::map<Uint32, bool> key_pressed_;
+        std::map<SDL_Keycode, bool> key_pressed_;
+
+        GLfloat mouse_angle_;
 
     public:
 
-        bool HandleEvent(Renderer::Camera* camera, Renderer::Player *player) const;
+        bool HandleEvent(Renderer::Camera* camera, Renderer::Player *player) ;
 
     };
 }

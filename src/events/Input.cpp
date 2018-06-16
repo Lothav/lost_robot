@@ -11,7 +11,8 @@ Events::Input &Events::Input::getInstance()
     return instance;
 }
 
-bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *player) const {
+bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *player)  {
+
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
 
@@ -19,70 +20,50 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
             return true;
         }
 
-        int mouse_pos_x, mouse_pos_y;
-        SDL_GetMouseState(&mouse_pos_x, &mouse_pos_y);
-        camera->rotate(mouse_pos_x, mouse_pos_y);
-
-        // Restart if hit 'r'
-        if (e.type == SDL_KEYDOWN) {
-
-            switch (e.key.keysym.sym) {
-                case SDLK_UP:
-                    player->turn(Renderer::Player::Direction::UP);
-                    break;
-
-                case SDLK_LEFT:
-                    player->turn(Renderer::Player::Direction::LEFT);
-                    break;
-
-                case SDLK_DOWN:
-                    player->turn(Renderer::Player::Direction::DOWN);
-                    break;
-
-                case SDLK_RIGHT:
-                    player->turn(Renderer::Player::Direction::RIGHT);
-                    break;
-
-                case SDLK_w:
-                    player->move({.0f, .05f, 0.0f});
-                    camera->move(player->getPosition());
-                    break;
-
-                case SDLK_a:
-                    player->move({-.05f, .0f, 0.f});
-                    camera->move(player->getPosition());
-                    break;
-
-                case SDLK_s:
-                    player->move({.0f, -.05f, 0.0f});
-                    camera->move(player->getPosition());
-                    break;
-
-                case SDLK_d:
-                    player->move({.05f, .0f, 0.0f});
-                    camera->move(player->getPosition());
-                    break;
-
-                case SDLK_r:
-                    camera->move({.0f, .0f, .01f});
-                    break;
-
-                case SDLK_e:
-                    camera->move({.0f, .0f, -.01f});
-                    break;
-
-                default:
-                    break;
-            }
-
+        if (e.type == SDL_MOUSEMOTION) {
+            int mouse_pos_x, mouse_pos_y;
+            SDL_GetMouseState(&mouse_pos_x, &mouse_pos_y);
+            mouse_angle_ = static_cast<GLfloat>((atan2((camera->getWindowSize()[0]/2) - mouse_pos_x, (camera->getWindowSize()[1]/2) - mouse_pos_y)*180.0000)/3.1416);
         }
 
-        // Restart if hit left mouse button
+        if (e.type == SDL_KEYDOWN) {
+            this->key_pressed_[e.key.keysym.sym] = true;
+        }
+
+        if (e.type == SDL_KEYUP) {
+            this->key_pressed_[e.key.keysym.sym] = false;
+        }
+
         if(e.type == SDL_MOUSEBUTTONDOWN) {
-            if (e.button.button == SDL_BUTTON_LEFT) {
-            } else if (e.button.button == SDL_BUTTON_RIGHT) {
-            }
+            this->key_pressed_[e.button.button] = true;
+        }
+
+        if(e.type == SDL_MOUSEBUTTONUP) {
+            this->key_pressed_[e.button.button] = false;
         }
     }
+
+    player->turn(mouse_angle_);
+
+    if(this->key_pressed_[SDLK_w]) {
+        player->move({.0f, .05f, 0.0f});
+        camera->move(player->getPosition());
+    }
+
+    if(this->key_pressed_[SDLK_a]) {
+        player->move({-.05f, .0f, 0.f});
+        camera->move(player->getPosition());
+    }
+
+    if(this->key_pressed_[SDLK_s]) {
+        player->move({.0f, -.05f, 0.0f});
+        camera->move(player->getPosition());
+    }
+
+    if(this->key_pressed_[SDLK_d]) {
+        player->move({.05f, .0f, 0.0f});
+        camera->move(player->getPosition());
+    }
+
     return false;
 }

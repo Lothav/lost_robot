@@ -61,12 +61,12 @@ int main(int argc, char *argv[]) {
         auto groundMesh = new Mesh();
         groundMesh->texture_index = 0;
         groundMesh->vertices = {};
-        groundMesh->vertices.push_back({1.0f * groundScale, 1.0f * groundScale, .0f, 1.0f, 0.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 1.0f, 0.0f});
         groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale, 1.0f * groundScale, .0f, 0.0f, 0.0f});
-        groundMesh->vertices.push_back({1.0f * groundScale, 1.0f * groundScale, .0f, 1.0f, 0.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale,  1.0f * groundScale, .0f, 0.0f, 0.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 1.0f, 0.0f});
         groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
-        groundMesh->vertices.push_back({1.0f * groundScale, -1.0f * groundScale, .0f, 1.0f, 1.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale, -1.0f * groundScale, .0f, 1.0f, 1.0f});
 
         ground->addMesh(groundMesh);
 
@@ -84,7 +84,6 @@ int main(int argc, char *argv[]) {
 
         glDepthFunc(GL_LESS);
         glEnable(GL_DEPTH_TEST);
-        camera->rotate(window_default_size[0] / 2, window_default_size[1] / 2);
 
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
