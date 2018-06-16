@@ -27,6 +27,9 @@ namespace Renderer
 
         glm::mat4 projection_;
 
+        glm::vec3 initial_pos_;
+
+        glm::vec3 player_;
         glm::vec3 pos_;
         glm::vec3 target_;
         glm::vec3 up_;
@@ -51,7 +54,9 @@ namespace Renderer
             // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
             this->projection_ = glm::perspective(glm::radians(45.0f), (GLfloat)window_size[0] / (GLfloat)window_size[1], 0.1f, 100.0f);
 
-            this->pos_ = glm::vec3( 0.0f,  0.0f, 3.0f );
+            initial_pos_ = glm::vec3( 0.0f,  0.0f, 3.0f );
+
+            this->pos_ = initial_pos_;
             this->target_ = glm::vec3( 0,  0,   0 );
             this->up_ = glm::vec3( 0, 1, 0 );
 
@@ -76,27 +81,51 @@ namespace Renderer
             glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &this->mvp_[0][0]);
         }
 
-        enum class Direction {
-            UP, DOWN, LEFT, RIGHT
-        };
 
-        void move(glm::vec3 direction)
+        void move(glm::vec3 target)
         {
-            this->view_ = glm::translate(view_, direction);
+            player_ = target;
+
+            pos_ = initial_pos_ + player_;
+            adjustRotation();
+            updateView();
             updateMVP();
         }
 
-        const static int MARGIN = 10;
+
 
         void rotate(int x, int y)
         {
-            float x_n =  (float) x / window_size_[0];
-            float y_n = (float) y / window_size_[1];
-
-            view_rotation_ = glm::rotate(glm::mat4(1.0f), glm::radians((0.5f - x_n) * 90), glm::vec3(0.0f, 1.0f, 0.0f));
-            view_rotation_ = glm::rotate(view_rotation_, glm::radians((0.5f - y_n) * 90), glm::vec3(1.0f, 0.0f, 0.0f));
-
+            mouse_pos_[0] = x;
+            mouse_pos_[1] = y;
+            updateView();
             updateMVP();
+        }
+
+        void adjustRotation()
+        {
+            float x_n =  (float) mouse_pos_[0] / window_size_[0];
+            float y_n = (float) mouse_pos_[1] / window_size_[1];
+
+            float angle_h = glm::radians((x_n - 0.5f) * 90);
+            float angle_v = glm::radians((0.5f - y_n) * 90);
+
+            glm::vec3 direction(
+                cos(angle_v) * sin(angle_h),
+                sin(angle_v),
+                cos(angle_v) * cos(angle_h)
+            );
+
+            glm::vec3 right = glm::vec3(
+                sin(angle_h - 3.14f/2.0f),
+                0,
+                cos(angle_h - 3.14f/2.0f)
+            );
+
+            glm::vec3 up = glm::cross( right, direction );
+
+            target_ = direction + player_;
+            up_ = up;
         }
 
         std::array<int, 2> getWindowSize()
@@ -107,16 +136,23 @@ namespace Renderer
     private:
         void updateView()
         {
+            adjustRotation();
+
             this->view_ = glm::lookAt(
-                    this->pos_, // Center
-                    this->target_, // Look
-                    this->up_  // Head up
+                pos_, // Center
+                target_,
+                up_  // Head up
             );
         }
 
         void updateMVP()
         {
-            this->mvp_ = this->projection_  *  this->view_ * this->view_rotation_ * this->model_;
+            this->mvp_ = this->projection_ * this->view_ * this->model_;
+        }
+
+        glm::vec3 rotateVector(float angle, glm::vec3 axis, glm::vec3 vec) {
+            auto v = glm::rotate(glm::mat4(1.0f), angle, axis) * glm::vec4(vec, 0.0f);
+            return glm::vec3(v);
         }
 
     };

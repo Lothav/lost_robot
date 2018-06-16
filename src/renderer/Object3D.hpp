@@ -32,11 +32,17 @@ namespace Renderer {
         std::vector<Mesh *> meshes_;
         GLuint vbo_;
         std::vector<GLuint> textures_;
+
+    protected:
         glm::mat4 model_;
+        glm::vec3 position_;
 
     public:
 
-        Object3D() : model_(glm::mat4(1.0f)) {
+        Object3D() :
+                model_(glm::mat4(1.0f)) ,
+                position_(glm::vec3(0.0f))
+        {
             glGenBuffers(1, &this->vbo_);
         }
 
@@ -136,12 +142,26 @@ namespace Renderer {
             this->model_ = model;
         }
 
-        glm::mat4 getModelMatrix() {
-            return this->model_;
+        virtual glm::mat4 getModelMatrix() {
+            return glm::translate(
+                this->model_,
+                this->position_
+            );
+        }
+
+        const glm::vec3 getPosition() const {
+            auto p = model_ * glm::vec4(position_, 1.0f);
+
+            return glm::vec3(p.x, p.y, p.z);
         }
 
         GLuint getVBO() const {
             return this->vbo_;
+        }
+
+        virtual void move(glm::vec3 direction)
+        {
+            position_ += direction;
         }
 
     };
