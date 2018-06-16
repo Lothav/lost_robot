@@ -78,16 +78,17 @@ int main(int argc, char *argv[]) {
         player->importFromFile("./data/mobs/spider/", "with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(player);
 
-        auto water_tank = new Renderer::Object3D(glm::vec3(20.f, 30.f, 0.f));
-        water_tank->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        water_tank->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx");
-        Renderer::BulkObject3D::getInstance().push_back(water_tank);
-
         auto camera = new Renderer::Camera(
             Renderer::BulkObject3D::getInstance().GetShaderProgram(),
             window_default_size,
             player->getPosition()
         );
+
+        auto npc = new Renderer::Object3D(glm::vec3(20.f, 30.f, 0.f));
+        npc->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
+        npc->importFromFile("./data/mobs/spider/", "with_texture.dae");
+        Renderer::BulkObject3D::getInstance().push_back(npc);
+
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
@@ -108,7 +109,8 @@ int main(int argc, char *argv[]) {
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
 
-            Renderer::Projectiles::getInstance().timeTick();
+            Renderer::Projectiles::getInstance().timeTick(player, npc);
+
 
             auto quit = Events::Input::getInstance().HandleEvent(camera, player);
             if (quit) return false;

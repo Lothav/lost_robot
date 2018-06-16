@@ -18,20 +18,27 @@
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+#include <algorithm>
 
 struct Mesh {
     std::vector<std::array<GLfloat, 5>> vertices;
     GLuint texture_index;
 };
 
+struct AxisAlignedBB {
+    glm::vec3 min_, max_;
+    AxisAlignedBB() : min_(0.0f), max_(0.0f) {}
+};
+
 namespace Renderer {
     class Object3D {
 
     private:
-
         std::vector<Mesh *> meshes_;
         GLuint vbo_;
         std::vector<GLuint> textures_;
+        AxisAlignedBB aabb_;
+        bool aabb_computed_;
 
     protected:
         glm::mat4 model_;
@@ -39,7 +46,10 @@ namespace Renderer {
 
     public:
 
-        Object3D(glm::vec3 position) : model_(glm::mat4(1.0f)), position_(position)
+        Object3D(glm::vec3 position) :
+                model_(glm::mat4(1.0f)),
+                position_(position),
+                aabb_computed_(false)
         {
             glGenBuffers(1, &this->vbo_);
         }
@@ -166,6 +176,37 @@ namespace Renderer {
             position_ += direction;
         }
 
+        AxisAlignedBB getAABB() {
+            const float eps = 1e-12;
+
+            if (!aabb_computed_) {
+                aabb_.min_ = glm::vec3(1 / eps);
+                aabb_.max_ = glm::vec3(-1 / eps);
+
+                for (const auto &m : meshes_) {
+                    for (const auto &v : m->vertices) {
+                        auto c = glm::vec3(v[0], v[1], v[2]);
+                        aabb_.min_.x = std::min(aabb_.min_.x, v[0]);
+                        aabb_.min_.y = std::min(aabb_.min_.y, v[1]);
+                        aabb_.min_.z = std::min(aabb_.min_.z, v[2]);
+                        aabb_.max_.x = std::max(aabb_.max_.x, v[0]);
+                        aabb_.max_.y = std::max(aabb_.max_.y, v[1]);
+                        aabb_.max_.z = std::max(aabb_.max_.z, v[2]);
+
+                    }
+                }
+
+                aabb_computed_ = true;
+            }
+
+            auto model = getModelMatrix();
+
+            AxisAlignedBB result;
+            result.min_ = glm::vec3(model * glm::vec4(aabb_.min_, 1.0f));
+            result.max_ = glm::vec3(model * glm::vec4(aabb_.max_, 1.0f));
+
+            return result;
+        }
     };
 }
 

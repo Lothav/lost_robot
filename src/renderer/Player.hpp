@@ -27,13 +27,6 @@ public:
         return directionRotation(Object3D::getModelMatrix());
     }
 
-    glm::vec3 velocity() {
-        int s = 1;
-        glm::vec3 direction = {0.0f, 1.0f, 0.0f};
-        const auto &r = directionRotation(glm::mat4(1.0f)) * glm::vec4(s * direction.x, s * direction.y, 0.0f, 1.0f);;
-        return glm::vec3(r);
-    }
-
     void move(glm::vec3 direction) override
     {
         position_ += glm::vec3(directionRotation(glm::mat4(1.0f)) * glm::vec4(direction, 0.0f));

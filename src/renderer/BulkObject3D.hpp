@@ -37,7 +37,8 @@ namespace Renderer
 
         void * operator new (std::size_t size);
 
-        void  operator delete (void* ptr, std::size_t) {}
+        void  operator delete (void* ptr, std::size_t) {
+        }
 
         void push_back(Object3D* Object3D);
 

@@ -51,22 +51,22 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
     player->turn(mouse_angle_);
 
     if(this->key_pressed_[SDLK_w]) {
-        player->move({.0f, .05f, 0.0f});
+        player->move({.0f, 0.5f, 0.0f});
         camera->move(player->getPosition());
     }
 
     if(this->key_pressed_[SDLK_a]) {
-        player->move({-.05f, .0f, 0.f});
+        player->move({-.5f, .0f, 0.f});
         camera->move(player->getPosition());
     }
 
     if(this->key_pressed_[SDLK_s]) {
-        player->move({.0f, -.05f, 0.0f});
+        player->move({.0f, -.5f, 0.0f});
         camera->move(player->getPosition());
     }
 
     if(this->key_pressed_[SDLK_d]) {
-        player->move({.05f, .0f, 0.0f});
+        player->move({.5f, .0f, 0.0f});
         camera->move(player->getPosition());
     }
 
