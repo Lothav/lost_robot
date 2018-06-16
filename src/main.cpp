@@ -83,7 +83,11 @@ int main(int argc, char *argv[]) {
         water_tank->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx");
         Renderer::BulkObject3D::getInstance().push_back(water_tank);
 
-        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size, player->getPosition());
+        auto camera = new Renderer::Camera(
+            Renderer::BulkObject3D::getInstance().GetShaderProgram(),
+            window_default_size,
+            player->getPosition()
+        );
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);

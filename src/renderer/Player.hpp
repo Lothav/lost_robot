@@ -36,7 +36,7 @@ public:
 
     void move(glm::vec3 direction) override
     {
-        position_ += glm::vec3(direction.x, direction.y, direction.z);
+        position_ += glm::vec3(directionRotation(glm::mat4(1.0f)) * glm::vec4(direction, 0.0f));
     }
 
 
