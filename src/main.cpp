@@ -78,7 +78,11 @@ int main(int argc, char *argv[]) {
         player->importFromFile("./data/mobs/spider/", "with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(player);
 
-        auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size, player->getPosition());
+        auto camera = new Renderer::Camera(
+            Renderer::BulkObject3D::getInstance().GetShaderProgram(),
+            window_default_size,
+            player->getPosition()
+        );
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
