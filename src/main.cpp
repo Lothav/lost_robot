@@ -9,6 +9,7 @@
 #include "events/Input.hpp"
 #include "renderer/Object3D.hpp"
 #include "renderer/BulkObject3D.hpp"
+#include "renderer/Player.hpp"
 
 void update() {
 
@@ -47,10 +48,10 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
-        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
-        text_test->setText("Test Bottom Left");
-        Renderer::BulkText::getInstance().push_back(text_test);
+//        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
+//        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
+//        text_test->setText("Test Bottom Left");
+//        Renderer::BulkText::getInstance().push_back(text_test);
 
         auto ground = new Renderer::Object3D();
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
@@ -73,16 +74,17 @@ int main(int argc, char *argv[]) {
 
         auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size);
 
-        auto spider = new Renderer::Object3D();
-        spider->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        spider->importFromFile("./data/mobs/spider/", "with_texture.dae");
-        Renderer::BulkObject3D::getInstance().push_back(spider);
+        auto player = new Renderer::Player();
+        player->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
+        player->importFromFile("./data/mobs/spider/", "with_texture.dae");
+        Renderer::BulkObject3D::getInstance().push_back(player);
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
         glDepthFunc(GL_LESS);
         glEnable(GL_DEPTH_TEST);
+        camera->rotate(window_default_size[0] / 2, window_default_size[1] / 2);
 
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
@@ -96,9 +98,7 @@ int main(int argc, char *argv[]) {
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
 
-            auto objects = Renderer::BulkObject3D::getInstance().getObjects();
-
-            auto quit = Events::Input::getInstance().HandleEvent(camera, objects);
+            auto quit = Events::Input::getInstance().HandleEvent(camera, player);
             if (quit) return false;
 
             // Swap Window

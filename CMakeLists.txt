@@ -40,6 +40,8 @@ add_executable(
         src/renderer/BulkObject3D.cpp
         src/renderer/BulkObject3D.hpp
 
+        src/renderer/Player.cpp
+        src/renderer/Player.hpp
 )
 
 target_link_libraries(launcher SDL2 SDL2_image GL GLEW freetype assimp)
