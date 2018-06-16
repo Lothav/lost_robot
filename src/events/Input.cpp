@@ -4,6 +4,7 @@
 
 #include "Input.hpp"
 #include "../renderer/Player.hpp"
+#include "../renderer/Projectiles.hpp"
 
 Events::Input &Events::Input::getInstance()
 {
@@ -28,6 +29,10 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
 
         if (e.type == SDL_KEYDOWN) {
             this->key_pressed_[e.key.keysym.sym] = true;
+
+            if (e.key.keysym.sym == SDLK_f) {
+                Renderer::Projectiles::getInstance().fire(player);
+            }
         }
 
         if (e.type == SDL_KEYUP) {

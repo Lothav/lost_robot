@@ -10,6 +10,7 @@
 #include "renderer/Object3D.hpp"
 #include "renderer/BulkObject3D.hpp"
 #include "renderer/Player.hpp"
+#include "renderer/Projectiles.hpp"
 
 void update() {
 
@@ -79,11 +80,14 @@ int main(int argc, char *argv[]) {
         player->importFromFile("./data/mobs/spider/", "with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(player);
 
+
+
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
         glDepthFunc(GL_LESS);
         glEnable(GL_DEPTH_TEST);
+
 
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
@@ -94,8 +98,11 @@ int main(int argc, char *argv[]) {
 
             update();
 
+
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
+
+            Renderer::Projectiles::getInstance().timeTick();
 
             auto quit = Events::Input::getInstance().HandleEvent(camera, player);
             if (quit) return false;

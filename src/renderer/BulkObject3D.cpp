@@ -41,6 +41,12 @@ void Renderer::BulkObject3D::push_back(Object3D* Object3D)
     this->objects3d_.push_back(Object3D);
 }
 
+void Renderer::BulkObject3D::remove(Renderer::Object3D *Object3D) {
+    auto &v = this->objects3d_;
+    v.erase(std::remove(v.begin(), v.end(), Object3D), v.end());
+
+}
+
 void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
 {
     this->shader_->use();
@@ -86,3 +92,4 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
     }
 
 }
+
