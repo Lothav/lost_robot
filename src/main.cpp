@@ -81,12 +81,15 @@ int main(int argc, char *argv[]) {
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
+        glDepthFunc(GL_LESS);
+        glEnable(GL_DEPTH_TEST);
+
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
 
             // Set screen to black
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             update();
 
