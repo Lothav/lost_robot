@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 
         auto spider = new Renderer::Object3D();
         spider->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        spider->importFromFile("./data/mobs/spider/", "with_texture.dae");
+        spider->importFromFile("./data/", "boblampclean.md5mesh", Renderer::BulkObject3D::getInstance().GetShaderProgram());
         Renderer::BulkObject3D::getInstance().push_back(spider);
 
         glAlphaFunc(GL_GREATER, 0.5);

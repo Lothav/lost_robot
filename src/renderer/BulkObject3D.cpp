@@ -19,8 +19,8 @@ Renderer::BulkObject3D::BulkObject3D() : objects3d_({}), shader_(nullptr)
 {
     // Compile/Link/Set Shader Program
     this->shader_ = new Renderer::Shader();
-    this->shader_->createGraphicShader(GL_VERTEX_SHADER, "default.vert");
-    this->shader_->createGraphicShader(GL_FRAGMENT_SHADER, "default.frag");
+    this->shader_->createGraphicShader(GL_VERTEX_SHADER, "skinning.vert");
+    this->shader_->createGraphicShader(GL_FRAGMENT_SHADER, "skinning.frag");
     this->shader_->link();
 
     auto loc = glGetUniformLocation(this->shader_->getShaderProgram(), "tex");
