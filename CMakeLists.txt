@@ -42,6 +42,8 @@ add_executable(
 
         src/renderer/Player.cpp
         src/renderer/Player.hpp
+        src/renderer/Projectiles.cpp
+        src/renderer/Projectiles.hpp
 )
 
 target_link_libraries(launcher SDL2 SDL2_image GL GLEW freetype assimp)

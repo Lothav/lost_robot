@@ -39,9 +39,7 @@ namespace Renderer {
 
     public:
 
-        Object3D() :
-                model_(glm::mat4(1.0f)) ,
-                position_(glm::vec3(0.0f))
+        Object3D(glm::vec3 position) : model_(glm::mat4(1.0f)), position_(position)
         {
             glGenBuffers(1, &this->vbo_);
         }
@@ -86,14 +84,19 @@ namespace Renderer {
 
                         if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path)) {
 
-                            GLuint texture_format = GL_RGB;
+                            GLuint texture_format = GL_RGBA;
 
                             std::string texture_file_name = path.data;
-                            if ((texture_file_name.substr( texture_file_name.length() - 3)) == "png") {
-                                texture_format = GL_RGBA;
+                            if ((texture_file_name.substr( texture_file_name.length() - 3)) == "jpg") {
+                                texture_format = GL_RGB;
                             }
 
-                            this->loadTexture(source_path + path.data, texture_format);
+                            std::string file_path = path.data;
+                            if (file_path.find("\\") != std::string::npos){
+                                file_path = file_path.replace(file_path.find("\\"), 1, "/");
+                            }
+
+                            this->loadTexture(source_path + file_path, texture_format);
                         }
                     }
                 }
@@ -102,7 +105,6 @@ namespace Renderer {
                 printf("Error parsing '%s': '%s'\n", source_path + file_name, Importer.GetErrorString());
             }
         }
-
 
         void loadTexture(const std::string &path, const GLenum format) {
             SDL_Surface *surf = IMG_Load(path.c_str());

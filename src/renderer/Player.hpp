@@ -17,6 +17,8 @@ private:
 
 public:
 
+    Player(const glm::vec3 &position) : Object3D(position) {}
+
     void turn(GLfloat angle) {
         turn_angle_ = angle;
     }

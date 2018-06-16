@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 //        text_test->setText("Test Bottom Left");
 //        Renderer::BulkText::getInstance().push_back(text_test);
 
-        auto ground = new Renderer::Object3D();
+        auto ground = new Renderer::Object3D(glm::vec3(0.f));
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
 
         int groundScale = 1;
@@ -73,10 +73,15 @@ int main(int argc, char *argv[]) {
 
         Renderer::BulkObject3D::getInstance().push_back(ground);
 
-        auto player = new Renderer::Player();
+        auto player = new Renderer::Player(glm::vec3(0.f));
         player->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
         player->importFromFile("./data/mobs/spider/", "with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(player);
+
+        auto water_tank = new Renderer::Object3D(glm::vec3(20.f, 30.f, 0.f));
+        water_tank->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
+        water_tank->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx");
+        Renderer::BulkObject3D::getInstance().push_back(water_tank);
 
         auto camera = new Renderer::Camera(Renderer::BulkObject3D::getInstance().GetShaderProgram(), window_default_size, player->getPosition());
 
@@ -95,7 +100,6 @@ int main(int argc, char *argv[]) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             update();
-
 
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);

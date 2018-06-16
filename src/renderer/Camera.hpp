@@ -20,15 +20,11 @@ namespace Renderer
     private:
 
         glm::mat4 mvp_;
-
         glm::mat4 model_;
-
         glm::mat4 view_;
-
         glm::mat4 projection_;
 
         glm::vec3 initial_pos_;
-
         glm::vec3 player_pos_;
         glm::vec3 pos_;
         glm::vec3 target_;

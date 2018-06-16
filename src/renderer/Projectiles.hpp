@@ -22,7 +22,7 @@ namespace Renderer {
         void fire(Renderer::Player *player)
         {
 
-            auto projectile = new Renderer::Object3D();
+            auto projectile = new Renderer::Object3D(glm::vec3(0.f));
             projectile->loadTexture("./data/environment/projectile.jpg", GL_RGB);
 
             auto mesh = new Mesh();
