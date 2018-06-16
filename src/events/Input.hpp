@@ -24,9 +24,11 @@ namespace Events
 
         Input() {}
 
+        std::map<Uint32, bool> key_pressed_;
+
     public:
 
-        bool HandleEvent(Renderer::Camera* camera, std::vector<Renderer::Object3D *, Memory::Allocator<Renderer::Object3D *>> objects) const
+        bool HandleEvent(Renderer::Camera* camera, std::vector<Renderer::Object3D *, Memory::Allocator<Renderer::Object3D *>> objects)
         {
             SDL_Event e;
             while (SDL_PollEvent(&e)) {
@@ -37,12 +39,6 @@ namespace Events
 
                 int mouse_pos_x, mouse_pos_y;
                 SDL_GetMouseState(&mouse_pos_x, &mouse_pos_y);
-
-                for (auto object: objects) {
-                    object->rotate(
-                        static_cast<GLfloat>(mouse_pos_x) / camera->getWindowSize()[0],
-                        static_cast<GLfloat>(mouse_pos_y) / camera->getWindowSize()[1]);
-                }
 
 
                 // Restart if hit 'r'
@@ -84,12 +80,28 @@ namespace Events
 
                 }
 
-                // Restart if hit left mouse button
-                if(e.type == SDL_MOUSEBUTTONDOWN) {
-                    if (e.button.button == SDL_BUTTON_LEFT) {
-                    } else if (e.button.button == SDL_BUTTON_RIGHT) {
-                    }
+                if (e.type == SDL_MOUSEBUTTONDOWN) {
+                    std::cout << "false" << std::endl;
+                    this->key_pressed_[e.button.button] = true;
                 }
+
+                if(e.type == SDL_MOUSEBUTTONUP) {
+                    std::cout << "true" << std::endl;
+                    this->key_pressed_[e.button.button] = false;
+                }
+
+                if(e.type == SDL_MOUSEMOTION) {
+                    std::cout << "motion" << std::endl;
+                    if (this->key_pressed_[SDL_BUTTON_RIGHT]) {
+                        for (auto object: objects) {
+                            object->rotate(
+                                static_cast<GLfloat>(mouse_pos_x) / camera->getWindowSize()[0],
+                                static_cast<GLfloat>(mouse_pos_y) / camera->getWindowSize()[1]);
+                        }
+                    }
+
+                }
+
             }
             return false;
         }
