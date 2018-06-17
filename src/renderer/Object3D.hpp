@@ -252,9 +252,9 @@ namespace Renderer
 
                 if ((b1 == b2) && (b2 == b3)) {
 
-                    float distance_0 = 1.0f/glm::distance(vertex_0, pos);
-                    float distance_1 = 1.0f/glm::distance(vertex_1, pos);
-                    float distance_2 = 1.0f/glm::distance(vertex_2, pos);
+                    float distance_0 = 1.0f/glm::pow(glm::distance(vertex_0, pos), 4);
+                    float distance_1 = 1.0f/glm::pow(glm::distance(vertex_1, pos), 4);
+                    float distance_2 = 1.0f/glm::pow(glm::distance(vertex_2, pos), 4);
 
                     return (vertex_0[2] * distance_0 + vertex_1[2] * distance_1 + vertex_2[2] * distance_2) / (distance_0 + distance_1 + distance_2);
                 }
