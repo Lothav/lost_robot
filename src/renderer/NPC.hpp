@@ -11,13 +11,16 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
-namespace Renderer {
+namespace Renderer
+{
     class NPC : public Object3D {
-        
+
     private:
+
         GLfloat turn_angle_ = 0.0f;
-        
+
     public:
+
         NPC(const glm::vec3 &position) : Object3D(position) {}
 
         void turn(GLfloat a)
@@ -30,10 +33,10 @@ namespace Renderer {
             return directionRotation(Object3D::getModelMatrix());
         }
 
-        private:
-            glm::mat4 directionRotation(glm::mat4 model_) {
-                return glm::rotate(model_, glm::radians(turn_angle_), glm::vec3(0.0f, 0.0f, 1.0f));
-            }
+    private:
+        glm::mat4 directionRotation(glm::mat4 model_) {
+            return glm::rotate(model_, glm::radians(turn_angle_), glm::vec3(0.0f, 0.0f, 1.0f));
+        }
     };
 }
 

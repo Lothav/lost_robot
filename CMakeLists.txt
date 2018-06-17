@@ -25,6 +25,9 @@ add_executable(
         src/memory/Pool.cpp
         src/memory/Pool.hpp
 
+        src/events/Input.cpp
+        src/events/Input.hpp
+
         src/renderer/Shader.cpp
         src/renderer/Shader.hpp
         src/renderer/Window.hpp
@@ -33,20 +36,16 @@ add_executable(
         src/renderer/Text.hpp
         src/renderer/BulkText.cpp
         src/renderer/BulkText.hpp
-
-        src/events/Input.cpp
-        src/events/Input.hpp
-
         src/renderer/Camera.cpp
         src/renderer/Camera.hpp
         src/renderer/Object3D.cpp
         src/renderer/Object3D.hpp
         src/renderer/BulkObject3D.cpp
         src/renderer/BulkObject3D.hpp
-
         src/renderer/Player.cpp
         src/renderer/Player.hpp
-
+        src/renderer/NPC.cpp
+        src/renderer/NPC.hpp
         src/renderer/Interactions.cpp
         src/renderer/Interactions.hpp
 
