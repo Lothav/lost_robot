@@ -25,10 +25,13 @@ namespace Renderer
 
         Player *player_;
         std::vector<NPC *> npcs_;
-        NPC * spider_npc_model;
         std::vector<Object3D *> projectiles_;
 
+        NPC*        spider_npc_model;
+        Object3D*   projectile_model;
+
     public:
+
         static Interactions& getInstance();
 
         Player *setupPlayer() {
@@ -46,6 +49,9 @@ namespace Renderer
             spider_npc_model = new NPC(glm::vec3());
             spider_npc_model->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
             spider_npc_model->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
+
+            projectile_model = new Renderer::Object3D(glm::vec3(0.f));
+            projectile_model->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx", {GL_RGB});
         }
 
         void spawnNPC() {
@@ -58,32 +64,25 @@ namespace Renderer
 
             auto npc = new NPC(*spider_npc_model); // copy of model
             npc->setPosition(glm::vec3(x, y, 0.5f));
+
             npcs_.push_back(npc);
             Renderer::BulkObject3D::getInstance().push_back(npc);
         }
 
-
         void fire(Renderer::Player *player)
         {
-            auto projectile = new Renderer::Object3D(glm::vec3(0.f));
-            projectile->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx", {GL_RGB});
-
+            auto projectile = new Renderer::Object3D(*projectile_model);
             projectile->transformModel(
                 glm::translate(glm::scale(player->getModelMatrix(), glm::vec3(.5)), glm::vec3(0.0, 0.0f, 3.0f))
             );
 
             projectiles_.push_back(projectile);
-
             Renderer::BulkObject3D::getInstance().push_back(projectile);
         }
 
-
-
         void timeTick()
         {
-
             const glm::vec3 &player_pos = player_->getWPosition();
-
 
             std::vector<Object3D *> swp;
 
@@ -155,7 +154,6 @@ namespace Renderer
                 GLfloat angle = glm::degrees(glm::angle(glm::normalize(delta), glm::vec3(0.0f, 1.0f, 0.0f)));
                 if (delta.x > 0) angle *= -1;
                 npc->turn(angle);
-
             }
         }
     };
