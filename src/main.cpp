@@ -69,12 +69,18 @@ int main(int argc, char *argv[]) {
             player->getWPosition()
         );
 
+        auto npc = new Renderer::NPC(glm::vec3(.0f, .0f, .3f));
+        npc->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
+        npc->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
+        Renderer::BulkObject3D::getInstance().push_back(npc);
+
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
         glDepthFunc(GL_LESS);
         glEnable(GL_DEPTH_TEST);
 
+        Renderer::Interactions::getInstance().loadDefaultModels();
 
         auto spawn = [&]() {
             Renderer::Interactions::getInstance().spawnNPC();

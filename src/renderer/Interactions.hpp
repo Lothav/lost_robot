@@ -16,7 +16,8 @@
 
 const float PLAYER_SCALE = 0.025f;
 
-namespace Renderer {
+namespace Renderer
+{
     class Interactions {
 
     private:
@@ -24,6 +25,7 @@ namespace Renderer {
 
         Player *player_;
         std::vector<NPC *> npcs_;
+        NPC * spider_npc_model;
         std::vector<Object3D *> projectiles_;
 
     public:
@@ -39,6 +41,13 @@ namespace Renderer {
             return player_;
         }
 
+        void loadDefaultModels()
+        {
+            spider_npc_model = new NPC(glm::vec3());
+            spider_npc_model->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
+            spider_npc_model->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
+        }
+
         void spawnNPC() {
             const float stddev = 0.5f / PLAYER_SCALE;
 
@@ -47,9 +56,8 @@ namespace Renderer {
             float x = std::normal_distribution<float>(player_position.x, stddev)(generator);
             float y = std::normal_distribution<float>(player_position.y, stddev)(generator);
 
-            auto npc = new Renderer::NPC(glm::vec3(x, y, 0.f));
-            npc->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
-            npc->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
+            auto npc = new NPC(*spider_npc_model); // copy of model
+            npc->setPosition(glm::vec3(x, y, 0.5f));
             npcs_.push_back(npc);
             Renderer::BulkObject3D::getInstance().push_back(npc);
         }

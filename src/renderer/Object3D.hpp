@@ -177,6 +177,11 @@ namespace Renderer {
             return position_;
         }
 
+        void setPosition(glm::vec3 position)
+        {
+            this->position_ = position;
+        }
+
         const glm::vec3 getWPosition() const {
             return glm::vec3(model_ * glm::vec4(position_, 1.0f));
         }
