@@ -117,7 +117,8 @@ namespace Renderer {
             }
         }
 
-        void loadTexture(const std::string &path, const GLenum format) {
+        void loadTexture(const std::string &path, const GLenum format)
+        {
             SDL_Surface *surf = IMG_Load(path.c_str());
 
             if (surf == nullptr) {

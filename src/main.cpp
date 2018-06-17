@@ -58,17 +58,18 @@ int main(int argc, char *argv[]) {
         auto ground = new Renderer::Object3D(glm::vec3(0.f));
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
 
-        int groundScale = 1;
+        float groundScale = 100.f;
 
         auto groundMesh = new Mesh();
         groundMesh->texture_index = 0;
         groundMesh->vertices = {};
-        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 1.0f, 0.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale,  1.0f * groundScale, .0f, 0.0f, 0.0f});
-        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 1.0f, 0.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
-        groundMesh->vertices.push_back({ 1.0f * groundScale, -1.0f * groundScale, .0f, 1.0f, 1.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 100.0f,   0.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f,   0.0f, 100.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale,  1.0f * groundScale, .0f,   0.0f,   0.0f});
+
+        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 100.0f,   0.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f,   0.0f, 100.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale, -1.0f * groundScale, .0f, 100.0f, 100.0f});
 
         ground->addMesh(groundMesh);
 
