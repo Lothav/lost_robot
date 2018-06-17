@@ -29,10 +29,6 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
 
         if (e.type == SDL_KEYDOWN) {
             this->key_pressed_[e.key.keysym.sym] = true;
-
-            if (e.key.keysym.sym == SDLK_f) {
-                Renderer::Projectiles::getInstance().fire(player);
-            }
         }
 
         if (e.type == SDL_KEYUP) {
@@ -41,6 +37,9 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
 
         if(e.type == SDL_MOUSEBUTTONDOWN) {
             this->key_pressed_[e.button.button] = true;
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                Renderer::Projectiles::getInstance().fire(player);
+            }
         }
 
         if(e.type == SDL_MOUSEBUTTONUP) {
