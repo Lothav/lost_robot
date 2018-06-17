@@ -2,9 +2,11 @@
 // Created by luiz0tavio on 6/4/18.
 //
 
+#include <glm/gtx/norm.hpp>
+
 #include "Input.hpp"
 #include "../renderer/Player.hpp"
-#include "../renderer/Projectiles.hpp"
+#include "../renderer/Interactions.hpp"
 
 Events::Input &Events::Input::getInstance()
 {
@@ -12,7 +14,7 @@ Events::Input &Events::Input::getInstance()
     return instance;
 }
 
-bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *player)  {
+bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *player, std::function<void()> spawn)  {
 
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
@@ -29,6 +31,8 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
 
         if (e.type == SDL_KEYDOWN) {
             this->key_pressed_[e.key.keysym.sym] = true;
+
+            if (e.key.keysym.sym == SDLK_n) spawn();
         }
 
         if (e.type == SDL_KEYUP) {
@@ -38,7 +42,7 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
         if(e.type == SDL_MOUSEBUTTONDOWN) {
             this->key_pressed_[e.button.button] = true;
             if (e.button.button == SDL_BUTTON_LEFT) {
-                Renderer::Projectiles::getInstance().fire(player);
+                Renderer::Interactions::getInstance().fire(player);
             }
         }
 
@@ -49,24 +53,20 @@ bool Events::Input::HandleEvent(Renderer::Camera *camera, Renderer::Player *play
 
     player->turn(mouse_angle_);
 
-    if(this->key_pressed_[SDLK_w]) {
-        player->move({.0f, 0.5f, 0.0f});
-        camera->move(player->getPosition());
-    }
+    glm::vec3 direction(0.0f);
 
-    if(this->key_pressed_[SDLK_a]) {
-        player->move({-.5f, .0f, 0.f});
-        camera->move(player->getPosition());
-    }
+    if(this->key_pressed_[SDLK_w]) direction += glm::vec3(0.0f, 1.0f, 0.0f);
 
-    if(this->key_pressed_[SDLK_s]) {
-        player->move({.0f, -.5f, 0.0f});
-        camera->move(player->getPosition());
-    }
+    if(this->key_pressed_[SDLK_a]) direction += glm::vec3(-1.0f, 0.0f, 0.0f);
 
-    if(this->key_pressed_[SDLK_d]) {
-        player->move({.5f, .0f, 0.0f});
-        camera->move(player->getPosition());
+    if(this->key_pressed_[SDLK_s]) direction += glm::vec3(0.0f, -1.0f, 0.0f);
+
+    if(this->key_pressed_[SDLK_d]) direction += glm::vec3(1.0f, 0.0f, 0.0f);
+
+    if (glm::l2Norm(direction) > 0) {
+        const float speed = .5f;
+        player->move(speed * glm::normalize(direction));
+        camera->move(player->getWPosition());
     }
 
     return false;

@@ -6,6 +6,7 @@
 #define MOONRAT_INPUT_HPP
 
 #include <SDL2/SDL_events.h>
+#include <functional>
 #include "../renderer/Camera.hpp"
 #include "../memory/Allocator.hpp"
 #include "../renderer/Player.hpp"
@@ -31,7 +32,7 @@ namespace Events
 
     public:
 
-        bool HandleEvent(Renderer::Camera* camera, Renderer::Player *player) ;
+        bool HandleEvent(Renderer::Camera* camera, Renderer::Player *player, std::function<void()> spawn) ;
 
     };
 }

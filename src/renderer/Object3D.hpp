@@ -109,7 +109,8 @@ namespace Renderer {
                 }
 
             } else {
-                printf("Error parsing '%s': '%s'\n", source_path + file_name, Importer.GetErrorString());
+                auto path = source_path + file_name;
+                printf("Error parsing '%s': '%s'\n", path.c_str(), Importer.GetErrorString());
             }
         }
 
@@ -172,9 +173,12 @@ namespace Renderer {
             return glm::translate( this->model_, this->position_);
         }
 
-        const glm::vec3 getPosition() const
-        {
-            return glm::vec3(this->model_ * glm::vec4(this->position_, 1.0f));
+        const glm::vec3 getPosition() const {
+            return position_;
+        }
+
+        const glm::vec3 getWPosition() const {
+            return glm::vec3(model_ * glm::vec4(position_, 1.0f));
         }
 
         GLuint getVBO() const
@@ -221,14 +225,12 @@ namespace Renderer {
 
                 for (const auto &m : meshes_) {
                     for (const auto &v : m->vertices) {
-                        auto c = glm::vec3(v[0], v[1], v[2]);
                         aabb_.min_.x = std::min(aabb_.min_.x, v[0]);
                         aabb_.min_.y = std::min(aabb_.min_.y, v[1]);
                         aabb_.min_.z = std::min(aabb_.min_.z, v[2]);
                         aabb_.max_.x = std::max(aabb_.max_.x, v[0]);
                         aabb_.max_.y = std::max(aabb_.max_.y, v[1]);
                         aabb_.max_.z = std::max(aabb_.max_.z, v[2]);
-
                     }
                 }
 
