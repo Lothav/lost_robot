@@ -18,6 +18,7 @@
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
+#include <glm/gtx/norm.hpp>
 #include <algorithm>
 #include <sstream>
 
@@ -193,26 +194,23 @@ namespace Renderer {
 
         float getZbyXY(glm::vec2 pos)
         {
-            int index_p = 0;
 
-            float min_x = SDL_MAX_UINT8;
-            float min_y = SDL_MAX_UINT8;
+            const float inf = 1.0f / 1e-12f;
+            float closest_dist = inf;
+            float closest_z = 0;
 
-            float z = -1.f;
-            for (int i = 0; i < meshes_[0]->vertices.size()-1; ++i) {
-                auto vertex = meshes_[0]->vertices[i];
-
-                auto calc_x = abs(vertex[0] - pos[0]);
-                auto calc_y = abs(vertex[1] - pos[1]);
-                if(calc_x < min_x && calc_y < min_y) {
-                    min_x = calc_x;
-                    min_y = calc_y;
-
-                    index_p = i;
+            for (const auto &m : meshes_) {
+                for (const auto &v : m->vertices) {
+                    auto current = glm::vec2(v[0], v[1]);
+                    if (glm::distance2(pos, current) < closest_dist) {
+                        closest_dist = glm::distance2(pos, current);
+                        closest_z = v[2];
+                    }
                 }
             }
 
-            return meshes_[0]->vertices[index_p][2];
+
+            return closest_z;
         }
 
         AxisAlignedBB getAABB()

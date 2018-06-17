@@ -94,10 +94,10 @@ int main(int argc, char *argv[]) {
 
             Renderer::Interactions::getInstance().timeTick();
 
-            auto quit = Events::Input::getInstance().HandleEvent(camera, player, spawn);
-
-            auto player_z = ground->getZbyXY(player->getPosition());
+            auto player_z = ground->getZbyXY(glm::vec2(player->getWPosition()));
             player->updateZ(player_z);
+
+            auto quit = Events::Input::getInstance().HandleEvent(camera, player, spawn);
 
             if (quit) return false;
 

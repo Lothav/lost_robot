@@ -6,6 +6,10 @@ include_directories(vendor/include/assimp/build)
 include_directories(vendor/include/assimp/include)
 include_directories(vendor/include/assimp/code)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DHB_SCRIPT_ADLAM=1 -DHB_SCRIPT_OSAGE ")
+#set(CMAKE_CXX_FLAGS "--std=c++14 -fsanitize=address -O1 -fno-omit-frame-pointer -g")
+set(CMAKE_CXX_FLAGS "--std=c++14 -O3 -Wall -Wextra ")
+
 add_subdirectory(vendor/lib/freetype2 ../vendor/lib/freetype2/build)
 include_directories(vendor/lib/freetype2/build)
 include_directories(vendor/lib/freetype2/include)
@@ -45,6 +49,9 @@ add_executable(
 
         src/renderer/Interactions.cpp
         src/renderer/Interactions.hpp
+
+        src/renderer/NPC.cpp
+        src/renderer/NPC.hpp
 )
 
 target_link_libraries(launcher SDL2 SDL2_image GL GLEW freetype assimp)
