@@ -13,6 +13,7 @@
 #include "renderer/Player.hpp"
 #include "renderer/NPC.hpp"
 #include "renderer/Interactions.hpp"
+#include "renderer/Ground.hpp"
 
 void update() {
 
@@ -56,10 +57,8 @@ int main(int argc, char *argv[]) {
         text_test->setText("Test Bottom Left");
         Renderer::BulkText::getInstance().push_back(text_test);
 
-        auto ground = new Renderer::Object3D(glm::vec3(0.f));
-        ground->importFromFile("./data/environment/SnowTerrain/", "SnowTerrain.dae", {GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB});
-        ground->transformVertices(glm::scale(glm::mat4(1.0f), glm::vec3(10.f)));
-        Renderer::BulkObject3D::getInstance().push_back(ground);
+
+        auto ground = new Renderer::Ground();
 
         auto player = Renderer::Interactions::getInstance().setupPlayer();
 

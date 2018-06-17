@@ -10,6 +10,7 @@
 #include "BulkObject3D.hpp"
 #include "Collisions.hpp"
 #include "NPC.hpp"
+#include "Ground.hpp"
 
 #include <glm/gtx/norm.hpp>
 #include <random>
@@ -24,8 +25,8 @@ namespace Renderer
         Player *player_;
         std::vector<NPC *> npcs_;
         std::vector<Object3D *> projectiles_;
-        Object3D* ground_;
 
+        Ground*     ground_;
         NPC*        spider_npc_model;
         Object3D*   projectile_model;
 
@@ -33,7 +34,7 @@ namespace Renderer
 
         static Interactions& getInstance();
 
-        void setupGround(Object3D* ground) {
+        void setupGround(Ground* ground) {
             this->ground_ = ground;
         }
 

@@ -43,7 +43,6 @@ namespace Renderer
     private:
 
         std::vector<Mesh *> meshes_;
-        std::vector<Face *> faces_;
 
         GLuint vbo_;
         std::vector<GLuint> textures_;
@@ -51,8 +50,11 @@ namespace Renderer
         bool aabb_computed_;
 
     protected:
+
         glm::mat4 model_;
         glm::vec3 position_;
+
+        std::vector<Face *> faces_;
 
     public:
 
@@ -115,7 +117,7 @@ namespace Renderer
                         aiString path;
                         auto material = pScene->mMaterials[i];
 
-                        if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path)) {
+                        if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path) && i < formats.size()) {
 
                             std::string file_path = path.data;
                             std::vector<std::string> result;
@@ -236,31 +238,7 @@ namespace Renderer
             return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
         }
 
-        float getZbyXY(glm::vec3 pos, float scale)
-        {
-            for (int i = 0; i < this->faces_.size(); i++) {
 
-                auto face = this->faces_[i];
-
-                auto vertex_0 = glm::vec3(face->vertices[0][0] * scale, face->vertices[0][1] * scale, face->vertices[0][2] * scale);
-                auto vertex_1 = glm::vec3(face->vertices[1][0] * scale, face->vertices[1][1] * scale, face->vertices[1][2] * scale);
-                auto vertex_2 = glm::vec3(face->vertices[2][0] * scale, face->vertices[2][1] * scale, face->vertices[2][2] * scale);
-
-                auto b1 = sign(pos, vertex_0, vertex_1) <= 0.0f;
-                auto b2 = sign(pos, vertex_1, vertex_2) <= 0.0f;
-                auto b3 = sign(pos, vertex_2, vertex_0) <= 0.0f;
-
-                if ((b1 == b2) && (b2 == b3)) {
-
-                    float distance_0 = 1.0f/glm::pow(glm::distance(vertex_0, pos), 4);
-                    float distance_1 = 1.0f/glm::pow(glm::distance(vertex_1, pos), 4);
-                    float distance_2 = 1.0f/glm::pow(glm::distance(vertex_2, pos), 4);
-
-                    return (vertex_0[2] * distance_0 + vertex_1[2] * distance_1 + vertex_2[2] * distance_2) / (distance_0 + distance_1 + distance_2);
-                }
-            }
-            return -1;
-        }
 
         AxisAlignedBB getAABB()
         {

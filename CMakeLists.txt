@@ -51,6 +51,6 @@ add_executable(
 
         src/renderer/NPC.cpp
         src/renderer/NPC.hpp
-)
+        src/renderer/Trees.cpp src/renderer/Trees.hpp src/renderer/Ground.cpp src/renderer/Ground.hpp)
 
 target_link_libraries(launcher SDL2 SDL2_image GL GLEW freetype assimp)
