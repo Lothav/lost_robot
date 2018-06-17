@@ -17,6 +17,7 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <algorithm>
 #include <sstream>
@@ -26,16 +27,24 @@ struct Mesh {
     GLuint texture_index;
 };
 
+struct Face {
+    std::array<std::array<GLfloat, 3>, 3> vertices;
+};
+
 struct AxisAlignedBB {
     glm::vec3 min_, max_;
     AxisAlignedBB() : min_(0.0f), max_(0.0f) {}
 };
 
-namespace Renderer {
-    class Object3D {
-
+namespace Renderer
+{
+    class Object3D
+    {
     private:
+
         std::vector<Mesh *> meshes_;
+        std::vector<Face *> faces_;
+
         GLuint vbo_;
         std::vector<GLuint> textures_;
         AxisAlignedBB aabb_;
@@ -76,15 +85,27 @@ namespace Renderer {
 
                         for (int k = 0; k < mesh->mNumFaces; k++) {
                             auto face = mesh->mFaces[k];
-                            for (int j = 0; j < face.mNumIndices; ++j) {
+
+                            auto faceObj = new Face{};
+                            faceObj->vertices = {};
+
+                            assert(face.mNumIndices == 3);
+                            for (int j = 0; j < 3; ++j) {
                                 auto pos = mesh->mVertices[face.mIndices[j]];
+
+                                faceObj->vertices[j][0] = mesh->mVertices[face.mIndices[j]][0];
+                                faceObj->vertices[j][1] = mesh->mVertices[face.mIndices[j]][1];
+                                faceObj->vertices[j][2] = mesh->mVertices[face.mIndices[j]][2];
+
                                 aiVector3D uv;
                                 if(mesh->mNumUVComponents[0] > 0) {
                                     uv = mesh->mTextureCoords[0][face.mIndices[j]];
                                 }
                                 meshObj->vertices.push_back({pos.x, pos.y, pos.z, uv.x, uv.y});
                             }
+                            this->faces_.push_back(faceObj);
                         }
+
                         this->addMesh(meshObj);
                     }
                 }
@@ -166,6 +187,15 @@ namespace Renderer {
                     vertex[2] = transformed[2];
                 }
             }
+
+            for(auto &face : this->faces_) {
+                for(auto &vertex : face->vertices) {
+                    auto transformed = model * glm::vec4({vertex[0],vertex[1],vertex[2], 1.f});
+                    vertex[0] = transformed[0];
+                    vertex[1] = transformed[1];
+                    vertex[2] = transformed[2];
+                }
+            }
         }
 
         virtual glm::mat4 getModelMatrix()
@@ -201,27 +231,35 @@ namespace Renderer {
             this->position_.z = z;
         }
 
-        float getZbyXY(glm::vec2 pos, float scale)
+        float sign (glm::vec2 p1, glm::vec2 p2, glm::vec2 p3)
         {
-            int index_p = -1;
-            float min_sum = 150.f, z = -1.f;
+            return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+        }
 
-            for (int i = 0; i < meshes_[0]->vertices.size(); ++i) {
-                auto vertex = meshes_[0]->vertices[i];
+        float getZbyXY(glm::vec3 pos, float scale)
+        {
+            for (int i = 0; i < this->faces_.size(); i++) {
 
-                vertex[0] *= scale;
-                vertex[1] *= scale;
+                auto face = this->faces_[i];
 
-                auto calc_x = abs(vertex[0] - pos[0]);
-                auto calc_y = abs(vertex[1] - pos[1]);
+                auto vertex_0 = glm::vec3(face->vertices[0][0] * scale, face->vertices[0][1] * scale, face->vertices[0][2] * scale);
+                auto vertex_1 = glm::vec3(face->vertices[1][0] * scale, face->vertices[1][1] * scale, face->vertices[1][2] * scale);
+                auto vertex_2 = glm::vec3(face->vertices[2][0] * scale, face->vertices[2][1] * scale, face->vertices[2][2] * scale);
 
-                if(calc_x + calc_y <= min_sum) {
-                    min_sum = calc_x + calc_y;
-                    index_p = i;
+                auto b1 = sign(pos, vertex_0, vertex_1) <= 0.0f;
+                auto b2 = sign(pos, vertex_1, vertex_2) <= 0.0f;
+                auto b3 = sign(pos, vertex_2, vertex_0) <= 0.0f;
+
+                if ((b1 == b2) && (b2 == b3)) {
+
+                    float distance_0 = 1.0f/glm::distance(vertex_0, pos);
+                    float distance_1 = 1.0f/glm::distance(vertex_1, pos);
+                    float distance_2 = 1.0f/glm::distance(vertex_2, pos);
+
+                    return (vertex_0[2] * distance_0 + vertex_1[2] * distance_1 + vertex_2[2] * distance_2) / (distance_0 + distance_1 + distance_2);
                 }
             }
-
-            return index_p > 0 ? scale*meshes_[0]->vertices[index_p][2] : -1;
+            return -1;
         }
 
         AxisAlignedBB getAABB()
