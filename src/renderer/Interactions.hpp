@@ -26,6 +26,7 @@ namespace Renderer
         Player *player_;
         std::vector<NPC *> npcs_;
         std::vector<Object3D *> projectiles_;
+        Object3D* ground_;
 
         NPC*        spider_npc_model;
         Object3D*   projectile_model;
@@ -33,6 +34,10 @@ namespace Renderer
     public:
 
         static Interactions& getInstance();
+
+        void setupGround(Object3D* ground) {
+            this->ground_ = ground;
+        }
 
         Player *setupPlayer()
         {
@@ -117,6 +122,12 @@ namespace Renderer
             const float inf = 1.0f / 1e-12f;
 
             for (auto &npc : npcs_) {
+
+                auto npc_z = this->ground_->getZbyXY(npc->getPosition(), 1/PLAYER_SCALE);
+                if (npc_z > 0) {
+                    npc->updateZ(npc_z);
+                }
+
                 const float speed = .25f;
                 const float threshold = .25f;
 

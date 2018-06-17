@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
         glEnable(GL_DEPTH_TEST);
 
         Renderer::Interactions::getInstance().loadDefaultModels();
+        Renderer::Interactions::getInstance().setupGround(ground);
 
         auto spawn = [&]() {
             Renderer::Interactions::getInstance().spawnNPC();

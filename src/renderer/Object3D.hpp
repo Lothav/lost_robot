@@ -196,6 +196,11 @@ namespace Renderer {
             this->position_ += direction;
         }
 
+        void updateZ(float z)
+        {
+            this->position_.z = z;
+        }
+
         float getZbyXY(glm::vec2 pos, float scale)
         {
             int index_p = -1;
