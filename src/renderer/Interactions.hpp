@@ -14,8 +14,6 @@
 #include <glm/gtx/norm.hpp>
 #include <random>
 
-const float PLAYER_SCALE = 0.025f;
-
 namespace Renderer
 {
     class Interactions {
