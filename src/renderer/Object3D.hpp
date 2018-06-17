@@ -196,28 +196,27 @@ namespace Renderer {
             this->position_ += direction;
         }
 
-        float getZbyXY(glm::vec2 pos)
+        float getZbyXY(glm::vec2 pos, float scale)
         {
-            int index_p = 0;
+            int index_p = -1;
+            float min_sum = 150.f, z = -1.f;
 
-            float min_x = SDL_MAX_UINT8;
-            float min_y = SDL_MAX_UINT8;
-
-            float z = -1.f;
-            for (int i = 0; i < meshes_[0]->vertices.size()-1; ++i) {
+            for (int i = 0; i < meshes_[0]->vertices.size(); ++i) {
                 auto vertex = meshes_[0]->vertices[i];
+
+                vertex[0] *= scale;
+                vertex[1] *= scale;
 
                 auto calc_x = abs(vertex[0] - pos[0]);
                 auto calc_y = abs(vertex[1] - pos[1]);
-                if(calc_x < min_x && calc_y < min_y) {
-                    min_x = calc_x;
-                    min_y = calc_y;
 
+                if(calc_x + calc_y <= min_sum) {
+                    min_sum = calc_x + calc_y;
                     index_p = i;
                 }
             }
 
-            return meshes_[0]->vertices[index_p][2];
+            return index_p > 0 ? scale*meshes_[0]->vertices[index_p][2] : -1;
         }
 
         AxisAlignedBB getAABB()

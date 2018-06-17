@@ -69,11 +69,6 @@ int main(int argc, char *argv[]) {
             player->getWPosition()
         );
 
-        auto npc = new Renderer::NPC(glm::vec3(.0f, .0f, .3f));
-        npc->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
-        npc->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
-        Renderer::BulkObject3D::getInstance().push_back(npc);
-
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
@@ -102,8 +97,10 @@ int main(int argc, char *argv[]) {
 
             auto quit = Events::Input::getInstance().HandleEvent(camera, player, spawn);
 
-            auto player_z = ground->getZbyXY(player->getPosition());
-            player->updateZ(player_z);
+            auto player_z = ground->getZbyXY(player->getPosition(), 1/PLAYER_SCALE);
+            if (player_z > 0) {
+                player->updateZ(player_z);
+            }
 
             if (quit) return false;
 

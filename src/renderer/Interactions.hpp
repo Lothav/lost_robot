@@ -34,7 +34,8 @@ namespace Renderer
 
         static Interactions& getInstance();
 
-        Player *setupPlayer() {
+        Player *setupPlayer()
+        {
             player_ = new Renderer::Player(glm::vec3(0.f));
             player_->importFromFile("./data/players/", "robot_1.fbx", {GL_RGB});
             player_->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
@@ -48,13 +49,15 @@ namespace Renderer
         {
             spider_npc_model = new NPC(glm::vec3());
             spider_npc_model->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
+            // spider_npc_model->importFromFile("./data/mobs/wolf/", "testao.fbx", {GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB});
             spider_npc_model->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
 
             projectile_model = new Renderer::Object3D(glm::vec3(0.f));
             projectile_model->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx", {GL_RGB});
         }
 
-        void spawnNPC() {
+        void spawnNPC()
+        {
             const float stddev = 0.5f / PLAYER_SCALE;
 
             auto player_position = player_->getPosition();
