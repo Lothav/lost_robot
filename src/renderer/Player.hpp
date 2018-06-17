@@ -33,6 +33,10 @@ public:
         position_ += direction;
     }
 
+    void updateZ(float z)
+    {
+        position_.z = z;
+    }
 
 private:
 

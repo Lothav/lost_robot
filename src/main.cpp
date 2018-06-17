@@ -56,24 +56,14 @@ int main(int argc, char *argv[]) {
         Renderer::BulkText::getInstance().push_back(text_test);
 
         auto ground = new Renderer::Object3D(glm::vec3(0.f));
-        ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
-
-        float groundScale = 100.f;
-
-        auto groundMesh = new Mesh();
-        groundMesh->texture_index = 0;
-        groundMesh->vertices = {};
-        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 100.0f,   0.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f,   0.0f, 100.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale,  1.0f * groundScale, .0f,   0.0f,   0.0f});
-
-        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 100.0f,   0.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f,   0.0f, 100.0f});
-        groundMesh->vertices.push_back({ 1.0f * groundScale, -1.0f * groundScale, .0f, 100.0f, 100.0f});
-
-        ground->addMesh(groundMesh);
-
+        ground->importFromFile("./data/environment/SnowTerrain/", "SnowTerrain.dae", {GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB});
+        ground->transformVertices(glm::scale(glm::mat4(1.0f), glm::vec3(10.f)));
         Renderer::BulkObject3D::getInstance().push_back(ground);
+
+        //auto tree02 = new Renderer::Object3D(glm::vec3(0.f));
+        //tree02->importFromFile("./data/environment/tree02/", "Tree.obj", {GL_RGB, GL_RGBA});
+        //tree02->transformVertices(glm::rotate(glm::radians(90.f), glm::vec3(1.f, 0.0f, .0f)));
+        //Renderer::BulkObject3D::getInstance().push_back(tree02);
 
         auto player = new Renderer::Player(glm::vec3(0.f));
         player->importFromFile("./data/players/", "robot_1.fbx", {GL_RGB});
@@ -115,6 +105,9 @@ int main(int argc, char *argv[]) {
 
             Renderer::Projectiles::getInstance().timeTick(player, npc);
             npc->timeTick(player);
+
+            auto player_z = ground->getZbyXY(player->getPosition());
+            player->updateZ(player_z);
 
             auto quit = Events::Input::getInstance().HandleEvent(camera, player);
             if (quit) return false;

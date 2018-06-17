@@ -47,10 +47,7 @@ namespace Renderer {
 
     public:
 
-        Object3D(glm::vec3 position) :
-                model_(glm::mat4(1.0f)),
-                position_(position),
-                aabb_computed_(false)
+        Object3D(glm::vec3 position) : model_(glm::mat4(1.0f)), position_(position), aabb_computed_(false)
         {
             glGenBuffers(1, &this->vbo_);
         }
@@ -59,7 +56,8 @@ namespace Renderer {
             this->meshes_.push_back(mesh);
         }
 
-        void importFromFile(const std::string &source_path, const std::string &file_name, std::vector<GLenum> formats) {
+        void importFromFile(const std::string &source_path, const std::string &file_name, std::vector<GLenum> formats)
+        {
             Assimp::Importer Importer;
             const aiScene *pScene = Importer.ReadFile(
                     source_path + file_name, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
@@ -80,7 +78,10 @@ namespace Renderer {
                             auto face = mesh->mFaces[k];
                             for (int j = 0; j < face.mNumIndices; ++j) {
                                 auto pos = mesh->mVertices[face.mIndices[j]];
-                                auto uv  = mesh->mTextureCoords[0][face.mIndices[j]];
+                                aiVector3D uv;
+                                if(mesh->mNumUVComponents[0] > 0) {
+                                    uv = mesh->mTextureCoords[0][face.mIndices[j]];
+                                }
                                 meshObj->vertices.push_back({pos.x, pos.y, pos.z, uv.x, uv.y});
                             }
                         }
@@ -95,15 +96,10 @@ namespace Renderer {
 
                         if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path)) {
 
-                            std::string texture_file_name = path.data;
-
                             std::string file_path = path.data;
-
                             std::vector<std::string> result;
                             std::istringstream iss(file_path);
-
-                            for (std::string token; std::getline(iss, token, '\\'); )
-                            {
+                            for (std::string token; std::getline(iss, token, '\\'); ) {
                                 result.push_back(std::move(token));
                             }
 
@@ -144,19 +140,23 @@ namespace Renderer {
             glGenerateMipmap(GL_TEXTURE_2D);
         }
 
-        std::vector<GLuint> getTextures() const {
+        std::vector<GLuint> getTextures() const
+        {
             return this->textures_;
         }
 
-        std::vector<Mesh *> getMeshes() const {
+        std::vector<Mesh *> getMeshes() const
+        {
             return this->meshes_;
         }
 
-        void transformModel(glm::mat4 model) {
+        void transformModel(glm::mat4 model)
+        {
             this->model_ = model;
         }
 
-        void transformVertices(glm::mat4 model) {
+        void transformVertices(glm::mat4 model)
+        {
             for(auto &mesh : this->meshes_) {
                 for(auto &vertex : mesh->vertices) {
                     auto transformed = model * glm::vec4({vertex[0],vertex[1],vertex[2], 1.f});
@@ -167,27 +167,52 @@ namespace Renderer {
             }
         }
 
-        virtual glm::mat4 getModelMatrix() {
-            return glm::translate(
-                this->model_,
-                this->position_
-            );
+        virtual glm::mat4 getModelMatrix()
+        {
+            return glm::translate( this->model_, this->position_);
         }
 
-        const glm::vec3 getPosition() const {
-            return glm::vec3(model_ * glm::vec4(position_, 1.0f));
+        const glm::vec3 getPosition() const
+        {
+            return glm::vec3(this->model_ * glm::vec4(this->position_, 1.0f));
         }
 
-        GLuint getVBO() const {
+        GLuint getVBO() const
+        {
             return this->vbo_;
         }
 
         virtual void move(glm::vec3 direction)
         {
-            position_ += direction;
+            this->position_ += direction;
         }
 
-        AxisAlignedBB getAABB() {
+        float getZbyXY(glm::vec2 pos)
+        {
+            int index_p = 0;
+
+            float min_x = SDL_MAX_UINT8;
+            float min_y = SDL_MAX_UINT8;
+
+            float z = -1.f;
+            for (int i = 0; i < meshes_[0]->vertices.size()-1; ++i) {
+                auto vertex = meshes_[0]->vertices[i];
+
+                auto calc_x = abs(vertex[0] - pos[0]);
+                auto calc_y = abs(vertex[1] - pos[1]);
+                if(calc_x < min_x && calc_y < min_y) {
+                    min_x = calc_x;
+                    min_y = calc_y;
+
+                    index_p = i;
+                }
+            }
+
+            return meshes_[0]->vertices[index_p][2];
+        }
+
+        AxisAlignedBB getAABB()
+        {
             const float eps = 1e-12;
 
             if (!aabb_computed_) {
@@ -211,8 +236,8 @@ namespace Renderer {
             }
 
             auto model = glm::translate(
-                this->model_,
-                this->position_
+                    this->model_,
+                    this->position_
             );
 
             AxisAlignedBB result;
