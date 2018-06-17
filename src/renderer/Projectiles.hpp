@@ -25,9 +25,9 @@ namespace Renderer {
         void fire(Renderer::Player *player)
         {
             auto projectile = new Renderer::Object3D(glm::vec3(0.f));
-            projectile->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx");
+            projectile->importFromFile("./data/environment/metal_water_tank/", "Water_Tank_fbx.fbx", {GL_RGB});
 
-            projectile->transform(
+            projectile->transformModel(
                 glm::translate(glm::scale(player->getModelMatrix(), glm::vec3(.5)), glm::vec3(0.0, 0.0f, 3.0f))
             );
 

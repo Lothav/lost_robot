@@ -50,10 +50,10 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-//        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
-//        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
-//        text_test->setText("Test Bottom Left");
-//        Renderer::BulkText::getInstance().push_back(text_test);
+        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
+        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
+        text_test->setText("Test Bottom Left");
+        Renderer::BulkText::getInstance().push_back(text_test);
 
         auto ground = new Renderer::Object3D(glm::vec3(0.f));
         ground->loadTexture("./data/environment/ground.jpg", GL_RGB);
@@ -75,8 +75,11 @@ int main(int argc, char *argv[]) {
         Renderer::BulkObject3D::getInstance().push_back(ground);
 
         auto player = new Renderer::Player(glm::vec3(0.f));
-        player->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        player->importFromFile("./data/mobs/spider/", "with_texture.dae");
+        player->importFromFile("./data/players/", "robot_1.fbx", {GL_RGB});
+        player->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
+        player->transformVertices(glm::rotate(glm::radians(90.f), glm::vec3(1.f, .0f, .0f)));
+        player->transformVertices(glm::rotate(glm::radians(180.f), glm::vec3(.0f, .0f, 1.f)));
+
         Renderer::BulkObject3D::getInstance().push_back(player);
 
         auto camera = new Renderer::Camera(
@@ -86,10 +89,9 @@ int main(int argc, char *argv[]) {
         );
 
         auto npc = new Renderer::NPC(glm::vec3(20.f, 30.f, 0.f));
-        npc->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        npc->importFromFile("./data/mobs/spider/", "with_texture.dae");
+        npc->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
+        npc->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
         Renderer::BulkObject3D::getInstance().push_back(npc);
-
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);

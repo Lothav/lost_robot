@@ -19,6 +19,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <algorithm>
+#include <sstream>
 
 struct Mesh {
     std::vector<std::array<GLfloat, 5>> vertices;
@@ -58,7 +59,7 @@ namespace Renderer {
             this->meshes_.push_back(mesh);
         }
 
-        void importFromFile(const std::string &source_path, const std::string &file_name) {
+        void importFromFile(const std::string &source_path, const std::string &file_name, std::vector<GLenum> formats) {
             Assimp::Importer Importer;
             const aiScene *pScene = Importer.ReadFile(
                     source_path + file_name, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
@@ -94,19 +95,19 @@ namespace Renderer {
 
                         if (aiReturn_SUCCESS == aiGetMaterialTexture(material, aiTextureType_DIFFUSE, 0, &path)) {
 
-                            GLuint texture_format = GL_RGBA;
-
                             std::string texture_file_name = path.data;
-                            if ((texture_file_name.substr( texture_file_name.length() - 3)) == "jpg") {
-                                texture_format = GL_RGB;
-                            }
 
                             std::string file_path = path.data;
-                            if (file_path.find("\\") != std::string::npos){
-                                file_path = file_path.replace(file_path.find("\\"), 1, "/");
+
+                            std::vector<std::string> result;
+                            std::istringstream iss(file_path);
+
+                            for (std::string token; std::getline(iss, token, '\\'); )
+                            {
+                                result.push_back(std::move(token));
                             }
 
-                            this->loadTexture(source_path + file_path, texture_format);
+                            this->loadTexture(source_path + result[result.size()-1], formats[i]);
                         }
                     }
                 }
@@ -150,8 +151,19 @@ namespace Renderer {
             return this->meshes_;
         }
 
-        void transform(glm::mat4 model) {
+        void transformModel(glm::mat4 model) {
             this->model_ = model;
+        }
+
+        void transformVertices(glm::mat4 model) {
+            for(auto &mesh : this->meshes_) {
+                for(auto &vertex : mesh->vertices) {
+                    auto transformed = model * glm::vec4({vertex[0],vertex[1],vertex[2], 1.f});
+                    vertex[0] = transformed[0];
+                    vertex[1] = transformed[1];
+                    vertex[2] = transformed[2];
+                }
+            }
         }
 
         virtual glm::mat4 getModelMatrix() {
