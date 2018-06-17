@@ -42,7 +42,6 @@ namespace Renderer {
 
             const glm::vec3 &player_pos = player->getPosition();
 
-            AxisAlignedBB npc_bb = npc->getAABB();
 
             std::vector<Object3D *> swp;
 
@@ -52,7 +51,8 @@ namespace Renderer {
                 o->move(glm::vec3(0.0, 3.0f, 0.f));
 
                 glm::vec3 object_position = o->getPosition();
-
+                
+                AxisAlignedBB npc_bb = npc->getAABB();
                 AxisAlignedBB object_bb = o->getAABB();
 
                 if (!Renderer::Collisions::check(&object_bb, &npc_bb) && glm::distance2(object_position, player_pos) < threshold) swp.push_back(o);

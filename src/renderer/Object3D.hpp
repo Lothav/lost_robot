@@ -162,9 +162,7 @@ namespace Renderer {
         }
 
         const glm::vec3 getPosition() const {
-            auto p = model_ * glm::vec4(position_, 1.0f);
-
-            return glm::vec3(p.x, p.y, p.z);
+            return glm::vec3(model_ * glm::vec4(position_, 1.0f));
         }
 
         GLuint getVBO() const {
@@ -199,7 +197,10 @@ namespace Renderer {
                 aabb_computed_ = true;
             }
 
-            auto model = getModelMatrix();
+            auto model = glm::translate(
+                this->model_,
+                this->position_
+            );
 
             AxisAlignedBB result;
             result.min_ = glm::vec3(model * glm::vec4(aabb_.min_, 1.0f));

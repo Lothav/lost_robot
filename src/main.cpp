@@ -10,6 +10,7 @@
 #include "renderer/Object3D.hpp"
 #include "renderer/BulkObject3D.hpp"
 #include "renderer/Player.hpp"
+#include "renderer/NPC.hpp"
 #include "renderer/Projectiles.hpp"
 
 void update() {
@@ -84,7 +85,7 @@ int main(int argc, char *argv[]) {
             player->getPosition()
         );
 
-        auto npc = new Renderer::Object3D(glm::vec3(20.f, 30.f, 0.f));
+        auto npc = new Renderer::NPC(glm::vec3(20.f, 30.f, 0.f));
         npc->transform(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
         npc->importFromFile("./data/mobs/spider/", "with_texture.dae");
         Renderer::BulkObject3D::getInstance().push_back(npc);
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
             Renderer::BulkObject3D::getInstance().draw(camera);
 
             Renderer::Projectiles::getInstance().timeTick(player, npc);
-
+            npc->timeTick(player);
 
             auto quit = Events::Input::getInstance().HandleEvent(camera, player);
             if (quit) return false;

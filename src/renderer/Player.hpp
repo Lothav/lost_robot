@@ -23,7 +23,8 @@ public:
         turn_angle_ = angle;
     }
 
-    glm::mat4 getModelMatrix() override {
+    glm::mat4 getModelMatrix() override
+    {
         return directionRotation(Object3D::getModelMatrix());
     }
 
