@@ -20,21 +20,9 @@ namespace Renderer {
     public:
         NPC(const glm::vec3 &position) : Object3D(position) {}
 
-        void timeTick(Renderer::Player *player)
+        void turn(GLfloat a)
         {
-            const float speed = .25;
-            const float threshold = .25;
-
-            auto a = getPosition();
-            auto b = player->getPosition();
-
-            auto delta = b - a;
-
-            if (glm::l2Norm(delta) > threshold) {
-                move(speed * glm::normalize(delta));
-            }
-            turn_angle_ = glm::degrees(glm::angle(glm::normalize(delta), glm::vec3(0.0f, 1.0f, 0.0f)));
-            if (delta.x > 0) turn_angle_ *= -1;
+            turn_angle_ = a;
         }
 
         glm::mat4 getModelMatrix() override

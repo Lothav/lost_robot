@@ -1,3 +1,4 @@
+#include <random>
 #include <functional>
 #include <memory>
 #include <SDL2/SDL_image.h>
@@ -11,7 +12,7 @@
 #include "renderer/BulkObject3D.hpp"
 #include "renderer/Player.hpp"
 #include "renderer/NPC.hpp"
-#include "renderer/Projectiles.hpp"
+#include "renderer/Interactions.hpp"
 
 void update() {
 
@@ -75,24 +76,13 @@ int main(int argc, char *argv[]) {
 
         Renderer::BulkObject3D::getInstance().push_back(ground);
 
-        auto player = new Renderer::Player(glm::vec3(0.f));
-        player->importFromFile("./data/players/", "robot_1.fbx", {GL_RGB});
-        player->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        player->transformVertices(glm::rotate(glm::radians(90.f), glm::vec3(1.f, .0f, .0f)));
-        player->transformVertices(glm::rotate(glm::radians(180.f), glm::vec3(.0f, .0f, 1.f)));
-
-        Renderer::BulkObject3D::getInstance().push_back(player);
+        auto player = Renderer::Interactions::getInstance().setupPlayer();
 
         auto camera = new Renderer::Camera(
             Renderer::BulkObject3D::getInstance().GetShaderProgram(),
             window_default_size,
-            player->getPosition()
+            player->getWPosition()
         );
-
-        auto npc = new Renderer::NPC(glm::vec3(20.f, 30.f, 0.f));
-        npc->importFromFile("./data/mobs/spider/", "with_texture.dae", {GL_RGBA, GL_RGB});
-        npc->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(0.025f)));
-        Renderer::BulkObject3D::getInstance().push_back(npc);
 
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
@@ -100,6 +90,10 @@ int main(int argc, char *argv[]) {
         glDepthFunc(GL_LESS);
         glEnable(GL_DEPTH_TEST);
 
+
+        auto spawn = [&]() {
+            Renderer::Interactions::getInstance().spawnNPC();
+        };
 
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
@@ -113,10 +107,11 @@ int main(int argc, char *argv[]) {
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
 
-            Renderer::Projectiles::getInstance().timeTick(player, npc);
-            npc->timeTick(player);
+            Renderer::Interactions::getInstance().timeTick();
 
-            auto quit = Events::Input::getInstance().HandleEvent(camera, player);
+
+            auto quit = Events::Input::getInstance().HandleEvent(camera, player, spawn);
+
             if (quit) return false;
 
             // Swap Window
