@@ -22,6 +22,7 @@
 
 #define ZERO_MEM(a) memset(a, 0, sizeof(a))
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
+#define MAX_BONES 100
 
 struct Vertex {
     std::vector<std::array<GLfloat, 3>> position;
@@ -99,6 +100,10 @@ namespace Renderer {
         void addMesh(Mesh *mesh) {
             this->meshes_.push_back(mesh);
         }
+
+        GLuint m_boneLocation[MAX_BONES];
+
+        const aiScene *pScene;
 
         std::vector<BoneInfo> m_BoneInfo;
 
@@ -243,37 +248,9 @@ namespace Renderer {
         }
 
 
-        void InitMesh(uint MeshIndex,
-            const aiMesh* paiMesh,
-            std::vector<glm::vec3>& Positions,
-            std::vector<glm::vec3>& Normals,
-            std::vector<glm::vec3>& TexCoords,
-            std::vector<VertexBoneData>& Bones,
-            std::vector<uint>& Indices)
+        void InitMesh(uint MeshIndex, const aiMesh* paiMesh, std::vector<VertexBoneData>& Bones)
         {
-            const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
-
-            // Populate the vertex attribute vectors
-            for (uint i = 0 ; i < paiMesh->mNumVertices ; i++) {
-                const aiVector3D* pPos      = &(paiMesh->mVertices[i]);
-                const aiVector3D* pNormal   = &(paiMesh->mNormals[i]);
-                const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
-
-                Positions.push_back(glm::vec3(pPos->x, pPos->y, pPos->z));
-                Normals.push_back(glm::vec3(pNormal->x, pNormal->y, pNormal->z));
-                TexCoords.push_back(glm::vec3(pTexCoord->x, pTexCoord->y, 0.0f));
-            }
-
             LoadBones(MeshIndex, paiMesh, Bones);
-
-            // Populate the index buffer
-            for (uint i = 0 ; i < paiMesh->mNumFaces ; i++) {
-                const aiFace& Face = paiMesh->mFaces[i];
-                assert(Face.mNumIndices == 3);
-                Indices.push_back(Face.mIndices[0]);
-                Indices.push_back(Face.mIndices[1]);
-                Indices.push_back(Face.mIndices[2]);
-            }
         }
 
         bool InitFromScene(const aiScene* pScene, GLuint shader_program)
@@ -281,8 +258,6 @@ namespace Renderer {
             m_Entries.resize(pScene->mNumMeshes);
 
             std::vector<glm::vec3> Positions;
-            std::vector<glm::vec3> Normals;
-            std::vector<glm::vec3> TexCoords;
             std::vector<VertexBoneData> Bones;
             std::vector<uint> Indices;
 
@@ -291,25 +266,17 @@ namespace Renderer {
 
             // Count the number of vertices and indices
             for (uint i = 0 ; i < m_Entries.size() ; i++) {
-                m_Entries[i].MaterialIndex = pScene->mMeshes[i]->mMaterialIndex;
-                m_Entries[i].NumIndices    = pScene->mMeshes[i]->mNumFaces * 3;
                 m_Entries[i].BaseVertex    = NumVertices;
-                m_Entries[i].BaseIndex     = NumIndices;
-
                 NumVertices += pScene->mMeshes[i]->mNumVertices;
-                NumIndices  += m_Entries[i].NumIndices;
             }
 
             // Reserve space in the vectors for the vertex attributes and indices
-            Positions.reserve(NumVertices);
-            Normals.reserve(NumVertices);
-            TexCoords.reserve(NumVertices);
             Bones.resize(NumVertices);
 
             // Initialize the meshes in the scene one by one
             for (uint i = 0 ; i < m_Entries.size() ; i++) {
                 const aiMesh* paiMesh = pScene->mMeshes[i];
-                InitMesh(i, paiMesh, Positions, Normals, TexCoords, Bones, Indices);
+                InitMesh(i, paiMesh, Bones);
             }
 
             GLuint bones_buffer;
@@ -332,7 +299,6 @@ namespace Renderer {
 
             return true;
         }
-
 
         void LoadBones(uint MeshIndex, const aiMesh* pMesh, std::vector<VertexBoneData>& Bones)
         {
@@ -408,15 +374,22 @@ namespace Renderer {
             }
         }
 
-        void BoneTransform(float TimeInSeconds, std::vector<aiMatrix4x4>& Transforms)
+        void BoneTransform(float TimeInSeconds)
         {
-            glm::mat4 Identity;
+            aiMatrix4x4 Identity;
+
+            std::vector<aiMatrix4x4> Transforms;
+            Assimp::Importer Importer;
+
+            auto pScene = Importer.ReadFile(
+                    std::string("./data/") + "boblampclean.md5mesh", aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+
 
             float TicksPerSecond = (float)(pScene->mAnimations[0]->mTicksPerSecond != 0 ? pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
             float TimeInTicks = TimeInSeconds * TicksPerSecond;
             float AnimationTime = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
 
-            ReadNodeHierarchy(AnimationTime, pScene->mRootNode, Identity);
+            ReadNodeHierarchy(AnimationTime, pScene->mRootNode, Identity, pScene);
 
             Transforms.resize(m_NumBones);
 
@@ -424,19 +397,39 @@ namespace Renderer {
                 Transforms[i] = m_BoneInfo[i].FinalTransformation;
             }
 
-            assert(Index < MAX_BONES);
-            //Transform.Print();
-            glUniformMatrix4fv(m_boneLocation[Index], 1, GL_TRUE, (const GLfloat*)Transform);
+            for (uint i = 0 ; i < Transforms.size() ; i++) {
+                assert(i < MAX_BONES);
+                glm::mat4 transform = {
+                        Transforms[i].a1, Transforms[i].a2, Transforms[i].a3, Transforms[i].a4,
+                        Transforms[i].b1, Transforms[i].b2, Transforms[i].b3, Transforms[i].b4,
+                        Transforms[i].c1, Transforms[i].c2, Transforms[i].c3, Transforms[i].c4,
+                        Transforms[i].d1, Transforms[i].d2, Transforms[i].d3, Transforms[i].d4,
+                };
+                glUniformMatrix4fv(m_boneLocation[i], 1, GL_TRUE, &transform[0][0]);
+            }
         }
 
         void importFromFile(const std::string &source_path, const std::string &file_name, const GLuint shader_program) {
             Assimp::Importer Importer;
-            const aiScene *pScene = Importer.ReadFile(
-                    source_path + file_name, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+            auto pScene = Importer.ReadFile(
+                    source_path + file_name, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
             if (pScene) {
 
                 InitFromScene(pScene, shader_program);
+
+                for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation) ; i++) {
+                    char Name[128];
+
+                    memset(Name, 0, sizeof(Name));
+                    snprintf(Name, sizeof(Name), "gBones[%d]", i);
+
+                    auto loc = glGetUniformLocation(shader_program, Name);
+                    if (loc < 0) std::cerr << "Can't find 'gBones' uniform on shader!" << std::endl;
+                    auto bone_pos = static_cast<GLuint>(loc);
+
+                    m_boneLocation[i] = bone_pos;
+                }
 
                 if (pScene->HasMeshes()) {
 
@@ -458,11 +451,6 @@ namespace Renderer {
                         }
 
                         this->addMesh(meshObj);
-                    }
-                }
-
-                if (pScene->HasAnimations()) {
-                    for (int i = 0; i < pScene->mNumMeshes; ++i) {
                     }
                 }
 

@@ -41,7 +41,7 @@ void Renderer::BulkObject3D::push_back(Object3D* Object3D)
     this->objects3d_.push_back(Object3D);
 }
 
-void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
+void Renderer::BulkObject3D::draw(Renderer::Camera *camera, Uint32 begin_time)
 {
     this->shader_->use();
 
@@ -53,6 +53,8 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
 
     glEnableVertexAttribArray(this->shader_vert_pos_);
     glEnableVertexAttribArray(this->shader_uv_pos_);
+
+    this->objects3d_[1]->BoneTransform(static_cast<float>((SDL_GetTicks() - begin_time))/1000.f);
 
     for (const auto &object3D : objects3d_) {
 

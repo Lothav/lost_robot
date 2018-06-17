@@ -81,6 +81,8 @@ int main(int argc, char *argv[]) {
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
+        auto begin_time = SDL_GetTicks();
+
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
 
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
             update();
 
             Renderer::BulkText::getInstance().draw(camera);
-            Renderer::BulkObject3D::getInstance().draw(camera);
+            Renderer::BulkObject3D::getInstance().draw(camera, begin_time);
 
             auto objects = Renderer::BulkObject3D::getInstance().getObjects();
 

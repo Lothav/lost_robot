@@ -41,8 +41,8 @@ namespace Renderer
             // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
             this->projection_ = glm::perspective(glm::radians(45.0f), (GLfloat)window_size[0] / (GLfloat)window_size[1], 0.1f, 100.0f);
 
-            this->center_ = glm::vec3( 0,  0, 2 );
-            this->origin_ = glm::vec3( 0,  0,   0 );
+            this->center_ = glm::vec3( 0, 0, 6 );
+            this->origin_ = glm::vec3( 0, 0,  0 );
 
             this->view_ = glm::lookAt(
                 this->center_,        // Camera is at (4,3,3), in World Space
