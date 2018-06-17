@@ -60,12 +60,12 @@ int main(int argc, char *argv[]) {
         auto groundMesh = new Mesh();
         groundMesh->texture_index = 0;
         groundMesh->vertices = {};
-        groundMesh->vertices.push_back({1.0f * groundScale, 1.0f * groundScale, .0f, 1.0f, 0.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 1.0f, 0.0f});
         groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
-        groundMesh->vertices.push_back({-1.0f * groundScale, 1.0f * groundScale, .0f, 0.0f, 0.0f});
-        groundMesh->vertices.push_back({1.0f * groundScale, 1.0f * groundScale, .0f, 1.0f, 0.0f});
+        groundMesh->vertices.push_back({-1.0f * groundScale,  1.0f * groundScale, .0f, 0.0f, 0.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale,  1.0f * groundScale, .0f, 1.0f, 0.0f});
         groundMesh->vertices.push_back({-1.0f * groundScale, -1.0f * groundScale, .0f, 0.0f, 1.0f});
-        groundMesh->vertices.push_back({1.0f * groundScale, -1.0f * groundScale, .0f, 1.0f, 1.0f});
+        groundMesh->vertices.push_back({ 1.0f * groundScale, -1.0f * groundScale, .0f, 1.0f, 1.0f});
 
         ground->addMesh(groundMesh);
 
@@ -81,6 +81,9 @@ int main(int argc, char *argv[]) {
         glAlphaFunc(GL_GREATER, 0.5);
         glEnable(GL_ALPHA_TEST);
 
+        glDepthFunc(GL_LESS);
+        glEnable(GL_DEPTH_TEST);
+
         auto begin_time = SDL_GetTicks();
 
         auto loop = [&]() -> bool {
@@ -88,12 +91,14 @@ int main(int argc, char *argv[]) {
 
             // Set screen to black
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             update();
 
+            spider->BoneTransform(static_cast<float>((SDL_GetTicks() - begin_time))/1000.f);
+
             Renderer::BulkText::getInstance().draw(camera);
-            Renderer::BulkObject3D::getInstance().draw(camera, begin_time);
+            Renderer::BulkObject3D::getInstance().draw(camera);
 
             auto objects = Renderer::BulkObject3D::getInstance().getObjects();
 

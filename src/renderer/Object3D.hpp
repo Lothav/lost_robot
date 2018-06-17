@@ -24,11 +24,6 @@
 #define ARRAY_SIZE_IN_ELEMENTS(a) (sizeof(a)/sizeof(a[0]))
 #define MAX_BONES 100
 
-struct Vertex {
-    std::vector<std::array<GLfloat, 3>> position;
-    std::vector<std::array<GLfloat, 2>> uv;
-    std::vector<std::array<GLfloat, 3>> normal;
-};
 
 struct Mesh {
     std::vector<std::array<GLfloat, 5>> vertices;
@@ -89,6 +84,7 @@ namespace Renderer {
         GLuint vbo_;
         std::vector<GLuint> textures_;
         glm::mat4 model_;
+        Assimp::Importer ai_importer_;
 
     public:
 
@@ -247,26 +243,18 @@ namespace Renderer {
             return NULL;
         }
 
-
-        void InitMesh(uint MeshIndex, const aiMesh* paiMesh, std::vector<VertexBoneData>& Bones)
-        {
-            LoadBones(MeshIndex, paiMesh, Bones);
-        }
-
-        bool InitFromScene(const aiScene* pScene, GLuint shader_program)
+        bool InitFromScene(GLuint shader_program)
         {
             m_Entries.resize(pScene->mNumMeshes);
 
-            std::vector<glm::vec3> Positions;
             std::vector<VertexBoneData> Bones;
-            std::vector<uint> Indices;
 
             uint NumVertices = 0;
             uint NumIndices = 0;
 
             // Count the number of vertices and indices
             for (uint i = 0 ; i < m_Entries.size() ; i++) {
-                m_Entries[i].BaseVertex    = NumVertices;
+                m_Entries[i].BaseVertex = NumVertices;
                 NumVertices += pScene->mMeshes[i]->mNumVertices;
             }
 
@@ -276,7 +264,7 @@ namespace Renderer {
             // Initialize the meshes in the scene one by one
             for (uint i = 0 ; i < m_Entries.size() ; i++) {
                 const aiMesh* paiMesh = pScene->mMeshes[i];
-                InitMesh(i, paiMesh, Bones);
+                LoadBones(i, paiMesh, Bones);
             }
 
             GLuint bones_buffer;
@@ -297,7 +285,7 @@ namespace Renderer {
             glEnableVertexAttribArray(weight_pos);
             glVertexAttribPointer(weight_pos , 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (const GLvoid*)16);
 
-            return true;
+            return glGetError() == GL_NO_ERROR;
         }
 
         void LoadBones(uint MeshIndex, const aiMesh* pMesh, std::vector<VertexBoneData>& Bones)
@@ -328,7 +316,7 @@ namespace Renderer {
         }
 
 
-        void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const aiMatrix4x4& ParentTransform, const aiScene *pScene)
+        void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const aiMatrix4x4& ParentTransform)
         {
             std::string NodeName = pNode->mName.data;
 
@@ -370,7 +358,7 @@ namespace Renderer {
             }
 
             for (uint i = 0 ; i < pNode->mNumChildren ; i++) {
-                ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation, pScene);
+                ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], GlobalTransformation);
             }
         }
 
@@ -379,17 +367,12 @@ namespace Renderer {
             aiMatrix4x4 Identity;
 
             std::vector<aiMatrix4x4> Transforms;
-            Assimp::Importer Importer;
-
-            auto pScene = Importer.ReadFile(
-                    std::string("./data/") + "boblampclean.md5mesh", aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
-
 
             float TicksPerSecond = (float)(pScene->mAnimations[0]->mTicksPerSecond != 0 ? pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
             float TimeInTicks = TimeInSeconds * TicksPerSecond;
             float AnimationTime = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
 
-            ReadNodeHierarchy(AnimationTime, pScene->mRootNode, Identity, pScene);
+            ReadNodeHierarchy(AnimationTime, pScene->mRootNode, Identity);
 
             Transforms.resize(m_NumBones);
 
@@ -399,24 +382,17 @@ namespace Renderer {
 
             for (uint i = 0 ; i < Transforms.size() ; i++) {
                 assert(i < MAX_BONES);
-                glm::mat4 transform = {
-                        Transforms[i].a1, Transforms[i].a2, Transforms[i].a3, Transforms[i].a4,
-                        Transforms[i].b1, Transforms[i].b2, Transforms[i].b3, Transforms[i].b4,
-                        Transforms[i].c1, Transforms[i].c2, Transforms[i].c3, Transforms[i].c4,
-                        Transforms[i].d1, Transforms[i].d2, Transforms[i].d3, Transforms[i].d4,
-                };
-                glUniformMatrix4fv(m_boneLocation[i], 1, GL_TRUE, &transform[0][0]);
+                glUniformMatrix4fv(m_boneLocation[i], 1, GL_TRUE, Transforms[i][0]);
             }
         }
 
-        void importFromFile(const std::string &source_path, const std::string &file_name, const GLuint shader_program) {
-            Assimp::Importer Importer;
-            auto pScene = Importer.ReadFile(
-                    source_path + file_name, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
+        void importFromFile(const std::string &source_path, const std::string &file_name, const GLuint shader_program)
+        {
+            this->pScene = ai_importer_.ReadFile( source_path + file_name, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-            if (pScene) {
+            if (this->pScene) {
 
-                InitFromScene(pScene, shader_program);
+                if (!InitFromScene(shader_program)) assert(0);
 
                 for (unsigned int i = 0 ; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation) ; i++) {
                     char Name[128];
@@ -474,7 +450,7 @@ namespace Renderer {
                 }
 
             } else {
-                printf("Error parsing '%s': '%s'\n", source_path + file_name, Importer.GetErrorString());
+                printf("Error parsing '%s': '%s'\n", source_path + file_name, ai_importer_.GetErrorString());
             }
 
         }
