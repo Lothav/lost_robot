@@ -194,6 +194,7 @@ namespace Renderer
                         npc->move(speed * glm::normalize(delta));
                     } else {
                         if (player_->hurt()) {
+                            player_->resetLives();
                             player_->move(-player_->getPosition());
                             auto player_z = ground_->getZbyXY(player_->getPosition(), 1 / PLAYER_SCALE);
                             if (player_z > 0) player_->updateZ(player_z);

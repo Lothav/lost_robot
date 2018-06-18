@@ -8,6 +8,7 @@
 #include "Object3D.hpp"
 
 const float PLAYER_SCALE = 0.025f;
+const unsigned int PLAYER_LIVES = 5;
 
 namespace Renderer {
 
@@ -16,7 +17,7 @@ namespace Renderer {
     private:
         GLfloat turn_angle_ = .0f;
         GLfloat z_ = 0.0f;
-        unsigned int lives = 5;
+        unsigned int lives = PLAYER_LIVES;
         unsigned int points = 0;
 
     public:
@@ -50,6 +51,10 @@ namespace Renderer {
             if (this->lives > 0) this->lives--;
             if (this->lives <= 0) this->points = 0;
             return this->lives <= 0;
+        }
+
+        void resetLives() {
+            this->lives = PLAYER_LIVES;
         }
 
         std::string getPointsText()
