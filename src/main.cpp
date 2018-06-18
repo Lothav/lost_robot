@@ -53,10 +53,11 @@ int main(int argc, char *argv[]) {
         }
 
         GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
-        auto text_test = new Renderer::Text(-1.f, -1.f, 48, white_color);
-        text_test->setText("Test Bottom Left");
-        Renderer::BulkText::getInstance().push_back(text_test);
+        auto text_lives = new Renderer::Text(-0.9f, 0.8f, 62, white_color);
+        Renderer::BulkText::getInstance().push_back(text_lives);
 
+        auto text_points = new Renderer::Text(0.6f, 0.8f, 62, white_color);
+        Renderer::BulkText::getInstance().push_back(text_points);
 
         auto ground = new Renderer::Ground();
 
@@ -101,6 +102,9 @@ int main(int argc, char *argv[]) {
             if (player_z > 0) {
                 player->updateZ(player_z);
             }
+
+            text_lives->setText("Lives: " + std::to_string(player->getLives()));
+            text_points->setText("Points: " + player->getPointsText());
 
             if (quit) return false;
 

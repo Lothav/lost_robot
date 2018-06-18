@@ -16,6 +16,8 @@ namespace Renderer {
 
         GLfloat turn_angle_ = .0f;
         GLfloat z_ = 0.0f;
+        unsigned int lives = 5;
+        unsigned int points = 0;
 
     public:
 
@@ -33,6 +35,31 @@ namespace Renderer {
                             glm::vec3(0.0f, 0.0f, z_)
                     )
             );
+        }
+
+        unsigned int getLives()
+        {
+            return this->lives;
+        }
+
+        std::string getPointsText()
+        {
+            std::string prefix;
+
+            if (this->points / 10000.f < 1.f){
+                prefix += "0";
+            }
+            if (this->points / 1000.f < 1.f){
+                prefix += "0";
+            }
+            if (this->points / 100.f < 1.f){
+                prefix += "0";
+            }
+            if (this->points / 10.f < 1.f){
+                prefix += "0";
+            }
+
+            return prefix + std::to_string(this->points);
         }
 
         void move(glm::vec3 direction) override
