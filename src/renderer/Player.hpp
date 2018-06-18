@@ -4,6 +4,7 @@
 #ifndef MOONRAT_PLAYER_H
 #define MOONRAT_PLAYER_H
 
+#include <cstring>
 #include "Object3D.hpp"
 
 const float PLAYER_SCALE = 0.025f;
@@ -13,7 +14,6 @@ namespace Renderer {
     class Player : public Object3D {
 
     private:
-
         GLfloat turn_angle_ = .0f;
         GLfloat z_ = 0.0f;
         unsigned int lives = 5;
@@ -30,10 +30,10 @@ namespace Renderer {
         glm::mat4 getModelMatrix() override
         {
             return directionRotation(
-                    glm::translate(
-                            Object3D::getModelMatrix(),
-                            glm::vec3(0.0f, 0.0f, z_)
-                    )
+                glm::translate(
+                    Object3D::getModelMatrix(),
+                    glm::vec3(0.0f, 0.0f, z_)
+                )
             );
         }
 
@@ -42,24 +42,21 @@ namespace Renderer {
             return this->lives;
         }
 
+        void scored() {
+            this->points++;
+        }
+
+        bool hurt() {
+            if (this->lives > 0) this->lives--;
+            if (this->lives <= 0) this->points = 0;
+            return this->lives <= 0;
+        }
+
         std::string getPointsText()
         {
-            std::string prefix;
-
-            if (this->points / 10000.f < 1.f){
-                prefix += "0";
-            }
-            if (this->points / 1000.f < 1.f){
-                prefix += "0";
-            }
-            if (this->points / 100.f < 1.f){
-                prefix += "0";
-            }
-            if (this->points / 10.f < 1.f){
-                prefix += "0";
-            }
-
-            return prefix + std::to_string(this->points);
+            static char buffer[8];
+            sprintf(buffer, "%05d", points);
+            return std::string(buffer);
         }
 
         void move(glm::vec3 direction) override

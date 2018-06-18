@@ -64,13 +64,22 @@ namespace Renderer
         {
             const float stddev = 0.5f / PLAYER_SCALE;
 
-            auto player_position = player_->getPosition();
+            auto position = player_->getPosition();
 
-            float x = std::normal_distribution<float>(player_position.x, stddev)(generator);
-            float y = std::normal_distribution<float>(player_position.y, stddev)(generator);
+            glm::vec3 direction(0.0f);
 
-            auto npc = new NPC(*spider_npc_model); // copy of model
-            npc->setPosition(glm::vec3(x, y, 0.5f));
+            float beta = std::uniform_real_distribution<float>(-1.0f, 1.0f)(generator);
+            direction += beta * glm::vec3(1.0f, 0.0, 0.f);
+
+            beta = std::uniform_real_distribution<float>(-1.0f, 1.0f)(generator);
+            direction += beta * glm::vec3(0.0f, 1.0, 0.f);
+
+            float distance = std::uniform_real_distribution<float>(stddev, 3 *  stddev)(generator);
+            direction = distance * glm::normalize(direction);
+            position += direction;
+
+            auto npc = new NPC(*spider_npc_model);  // copy of model
+            npc->setPosition(glm::vec3(position.x, position.y, 0.5f));
 
             npcs_.push_back(npc);
             Renderer::BulkObject3D::getInstance().push_back(npc);
@@ -78,24 +87,26 @@ namespace Renderer
 
         void fire(Renderer::Player *player)
         {
-            if(!this->projectiles_.empty()) {
-                return;
-            }
+            const int max_projectiles = 3;
+            if (this->projectiles_.size() > max_projectiles) return;
 
             auto projectile = new Renderer::Object3D(*projectile_model);
             projectile->transformModel(
-                glm::translate(glm::scale(player->getModelMatrix(), glm::vec3(.5)), glm::vec3(0.0, 0.0f, 3.0f))
+                glm::translate(glm::scale(player->getModelMatrix(), glm::vec3(.5)), glm::vec3(0.0, 0.0f, 2.0f))
             );
 
             projectiles_.push_back(projectile);
             Renderer::BulkObject3D::getInstance().push_back(projectile);
         }
 
-        void timeTick()
+        void timeTick(
+            std::function<void()> reset_spawn_cycle
+        )
         {
             const glm::vec3 &player_pos = player_->getWPosition();
 
-            std::vector<Object3D *> swp;
+            std::vector<NPC *> npc_swp;
+            std::vector<Object3D *> projectile_swp;
 
             for (size_t i = 0; projectiles_.size() > i; i++) {
                 const auto &o = projectiles_[i];
@@ -107,26 +118,44 @@ namespace Renderer
 
                 bool collision = false;
 
+                npc_swp.clear();
+
                 for (const auto &npc : npcs_) {
                     AxisAlignedBB npc_bb = npc->getAABB();
-                    if (Renderer::Collisions::check(&object_bb, &npc_bb)) collision = true;
+                    if (Renderer::Collisions::check(&object_bb, &npc_bb)) {
+                        collision = true;
+
+                        if (npc->shoot()) {
+                            player_->scored();
+                            BulkObject3D::getInstance().remove(npc);
+                            delete npc;
+                        }
+                        else npc_swp.push_back(npc);
+                    }
+                    else {
+                        npc_swp.push_back(npc);
+                    }
                 }
+                npcs_ = npc_swp;
+
 
                 const float threshold = 4.0f;
-                if (!collision && glm::distance2(object_position, player_pos) < threshold) swp.push_back(o);
+                if (!collision && glm::distance2(object_position, player_pos) < threshold) projectile_swp.push_back(o);
                 else {
                     BulkObject3D::getInstance().remove(o);
                 }
 
             }
 
-            projectiles_ = swp;
+            projectiles_ = projectile_swp;
 
             const float inf = 1.0f / 1e-12f;
 
+            bool hurt = false;
+
             for (auto &npc : npcs_) {
 
-                auto npc_z = this->ground_->getZbyXY(npc->getPosition(), 1/PLAYER_SCALE);
+                auto npc_z = this->ground_->getZbyXY(npc->getPosition(), 1 / PLAYER_SCALE);
                 if (npc_z > 0) {
                     npc->updateZ(npc_z);
                 }
@@ -163,6 +192,15 @@ namespace Renderer
 
                     if (glm::l2Norm(delta) > threshold) {
                         npc->move(speed * glm::normalize(delta));
+                    } else {
+                        if (player_->hurt()) {
+                            player_->move(-player_->getPosition());
+                            auto player_z = ground_->getZbyXY(player_->getPosition(), 1 / PLAYER_SCALE);
+                            if (player_z > 0) player_->updateZ(player_z);
+                            reset_spawn_cycle();
+                        }
+
+                        hurt = true;
                     }
 
                 }
@@ -171,6 +209,14 @@ namespace Renderer
                 GLfloat angle = glm::degrees(glm::angle(glm::normalize(delta), glm::vec3(0.0f, 1.0f, 0.0f)));
                 if (delta.x > 0) angle *= -1;
                 npc->turn(angle);
+            }
+
+            if (hurt) {
+                for (auto &npc : npcs_) {
+                    BulkObject3D::getInstance().remove(npc);
+                    delete npc;
+                }
+                npcs_.clear();
             }
         }
     };

@@ -240,6 +240,10 @@ namespace Renderer
             this->position_.z = z;
         }
 
+        float sign (glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {
+            return sign(glm::vec2(p1), glm::vec2(p2), glm::vec2(p3));
+        }
+
         float sign (glm::vec2 p1, glm::vec2 p2, glm::vec2 p3)
         {
             return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);

@@ -52,11 +52,11 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
 
-        GLfloat white_color[4]{1.f, 1.f, 1.f, 1.f};
-        auto text_lives = new Renderer::Text(-0.9f, 0.8f, 62, white_color);
+        GLfloat text_color[4]{1.f, 1.f, 1.f, 1.f};
+        auto text_lives = new Renderer::Text(-0.9f, 0.8f, 62, text_color);
         Renderer::BulkText::getInstance().push_back(text_lives);
 
-        auto text_points = new Renderer::Text(0.6f, 0.8f, 62, white_color);
+        auto text_points = new Renderer::Text(0.6f, 0.8f, 62, text_color);
         Renderer::BulkText::getInstance().push_back(text_points);
 
         auto ground = new Renderer::Ground();
@@ -64,9 +64,9 @@ int main(int argc, char *argv[]) {
         auto player = Renderer::Interactions::getInstance().setupPlayer();
 
         auto camera = new Renderer::Camera(
-            Renderer::BulkObject3D::getInstance().GetShaderProgram(),
-            window_default_size,
-            player->getWPosition()
+                Renderer::BulkObject3D::getInstance().GetShaderProgram(),
+                window_default_size,
+                player->getWPosition()
         );
 
         glAlphaFunc(GL_GREATER, 0.5);
@@ -78,13 +78,21 @@ int main(int argc, char *argv[]) {
         Renderer::Interactions::getInstance().loadDefaultModels();
         Renderer::Interactions::getInstance().setupGround(ground);
 
+        unsigned int spawn_cycle;
+        unsigned int spawn_cycle_count;
+        unsigned int spawn_velocity;
+
         auto spawn = [&]() {
             Renderer::Interactions::getInstance().spawnNPC();
         };
 
-        unsigned int spawn_cycle = 200;
-        unsigned int spawn_cycle_count = 150;
-        unsigned int spawn_velocity = 0;
+        auto reset_spawn_cycle = [&]() {
+            spawn_cycle = 200;
+            spawn_cycle_count = 150;
+            spawn_velocity = 0;
+        };
+
+        reset_spawn_cycle();
 
         auto loop = [&]() -> bool {
             auto start = SDL_GetTicks();
@@ -96,9 +104,9 @@ int main(int argc, char *argv[]) {
             update();
 
             spawn_cycle_count++;
-            if(spawn_cycle_count % (spawn_cycle - spawn_velocity) == 0) {
+            if (spawn_cycle_count % (spawn_cycle - spawn_velocity) == 0) {
                 spawn_cycle_count = 0;
-                if(spawn_cycle - spawn_velocity > spawn_velocity){
+                if (spawn_cycle - spawn_velocity > spawn_velocity) {
                     spawn_velocity += 20;
                 }
                 spawn();
@@ -107,11 +115,11 @@ int main(int argc, char *argv[]) {
             Renderer::BulkText::getInstance().draw(camera);
             Renderer::BulkObject3D::getInstance().draw(camera);
 
-            Renderer::Interactions::getInstance().timeTick();
+            Renderer::Interactions::getInstance().timeTick(reset_spawn_cycle);
 
             auto quit = Events::Input::getInstance().HandleEvent(camera, player, spawn);
 
-            auto player_z = ground->getZbyXY(player->getPosition(), 1/PLAYER_SCALE);
+            auto player_z = ground->getZbyXY(player->getPosition(), 1 / PLAYER_SCALE);
             if (player_z > 0) {
                 player->updateZ(player_z);
             }

@@ -11,17 +11,20 @@
 #include <glm/gtx/norm.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
+const int NPC_LIFES = 3;
+
 namespace Renderer
 {
     class NPC : public Object3D {
 
     private:
-
         GLfloat turn_angle_ = 0.0f;
+
+        int lifes_;
 
     public:
 
-        NPC(const glm::vec3 &position) : Object3D(position) {}
+        NPC(const glm::vec3 &position) : Object3D(position), lifes_(NPC_LIFES) {}
 
         void turn(GLfloat a)
         {
@@ -31,6 +34,11 @@ namespace Renderer
         glm::mat4 getModelMatrix() override
         {
             return directionRotation(Object3D::getModelMatrix());
+        }
+
+        bool shoot() {
+            if (lifes_ > 0) lifes_--;
+            return lifes_ <= 0;
         }
 
     private:
