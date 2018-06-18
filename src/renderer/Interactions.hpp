@@ -100,7 +100,7 @@ namespace Renderer
         }
 
         void timeTick(
-            std::function<void()> reset_spawn_cycle
+            const std::function<void()> &reset_spawn_cycle
         )
         {
             const glm::vec3 &player_pos = player_->getWPosition();
@@ -109,12 +109,12 @@ namespace Renderer
             std::vector<Object3D *> projectile_swp;
 
             for (size_t i = 0; projectiles_.size() > i; i++) {
-                const auto &o = projectiles_[i];
+                const auto &projectile_ = projectiles_[i];
 
-                o->move(glm::vec3(0.0, 3.0f, 0.f));
+                projectile_->move(glm::vec3(0.0, 3.0f, 0.f));
 
-                glm::vec3 object_position = o->getWPosition();
-                AxisAlignedBB object_bb = o->getAABB();
+                glm::vec3 object_position = projectile_->getWPosition();
+                AxisAlignedBB object_bb = projectile_->getAABB();
 
                 bool collision = false;
 
@@ -140,11 +140,11 @@ namespace Renderer
 
 
                 const float threshold = 4.0f;
-                if (!collision && glm::distance2(object_position, player_pos) < threshold) projectile_swp.push_back(o);
+                if (!collision && glm::distance2(object_position, player_pos) < threshold) projectile_swp.push_back(projectile_);
                 else {
-                    BulkObject3D::getInstance().remove(o);
+                    BulkObject3D::getInstance().remove(projectile_);
+                    delete projectile_;
                 }
-
             }
 
             projectiles_ = projectile_swp;

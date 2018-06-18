@@ -32,7 +32,7 @@ namespace Events
 
     public:
 
-        bool HandleEvent(Renderer::Camera* camera, Renderer::Player *player, std::function<void()> spawn) ;
+        bool HandleEvent(Renderer::Camera* camera, Renderer::Player *player, const std::function<void()> &spawn) ;
 
     };
 }

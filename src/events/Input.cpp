@@ -17,7 +17,7 @@ Events::Input &Events::Input::getInstance()
 bool Events::Input::HandleEvent(
         Renderer::Camera *camera,
         Renderer::Player *player,
-        std::function<void()> spawn
+        const std::function<void()> &spawn
 )  {
 
     SDL_Event e;
