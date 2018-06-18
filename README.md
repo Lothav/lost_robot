@@ -1,5 +1,7 @@
 # Lost Robot
 
+![Lost Robot Gif](https://github.com/Luiz0tavio/lost_robot/blob/master/bin/data/lost_robot_gif.gif)
+
 ### Dependencies
 
 Linux OS based.
