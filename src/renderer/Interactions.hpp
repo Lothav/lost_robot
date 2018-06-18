@@ -78,6 +78,10 @@ namespace Renderer
 
         void fire(Renderer::Player *player)
         {
+            if(!this->projectiles_.empty()) {
+                return;
+            }
+
             auto projectile = new Renderer::Object3D(*projectile_model);
             projectile->transformModel(
                 glm::translate(glm::scale(player->getModelMatrix(), glm::vec3(.5)), glm::vec3(0.0, 0.0f, 3.0f))
