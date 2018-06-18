@@ -27,7 +27,7 @@ namespace Renderer
 
     public:
 
-        Trees ()
+        Trees (const std::function<void(Object3D *t)> &addTree)
         {
             auto tree01 = new Tree();
             tree01->source_path = "./data/environment/tree01/";
@@ -49,7 +49,11 @@ namespace Renderer
                 tree->transformVertices(glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)));
                 tree->transformVertices(glm::rotate(glm::radians(90.f), glm::vec3(1.0f, 0.0f, .0f)));
                 Renderer::BulkObject3D::getInstance().push_back(tree);
+                //Renderer::Interactions::getInstance().addTree(tree);
+                addTree(tree);
             }
+
+
 
         }
     };

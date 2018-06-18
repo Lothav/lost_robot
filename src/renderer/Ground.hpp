@@ -20,13 +20,13 @@ namespace Renderer
 
     public:
 
-        Ground() : Object3D(glm::vec3(0.f))
+        Ground(const std::function<void(Object3D *t)> &addTree) : Object3D(glm::vec3(0.f))
         {
             this->importFromFile("./data/environment/SnowTerrain/", "SnowTerrain.dae", {GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB});
             this->transformVertices(glm::scale(glm::mat4(1.0f), glm::vec3(10.f)));
             Renderer::BulkObject3D::getInstance().push_back(this);
 
-            trees_ = new Trees();
+            trees_ = new Trees(addTree);
         }
 
         float getZbyXY(glm::vec3 pos, float scale)

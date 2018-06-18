@@ -25,6 +25,7 @@ namespace Renderer
         Player *player_;
         std::vector<NPC *> npcs_;
         std::vector<Object3D *> projectiles_;
+        std::vector<Object3D *> trees_;
 
         Ground*     ground_;
         NPC*        spider_npc_model;
@@ -99,6 +100,10 @@ namespace Renderer
             Renderer::BulkObject3D::getInstance().push_back(projectile);
         }
 
+        void addTree(Object3D *tree) {
+            trees_.push_back(tree);
+        }
+
         void timeTick(
             const std::function<void()> &reset_spawn_cycle
         )
@@ -171,6 +176,15 @@ namespace Renderer
                 for (auto &other : npcs_) {
                     if (other == npc) continue;
 
+                    const glm::vec3 &other_position = other->getWPosition();
+                    auto current_dist = glm::distance2(npc_position, other_position);
+
+                    if (current_dist < closest_dist) {
+                        closest = other_position;
+                        closest_dist = current_dist;
+                    }
+                }
+                for (auto &other : trees_) {
                     const glm::vec3 &other_position = other->getWPosition();
                     auto current_dist = glm::distance2(npc_position, other_position);
 
