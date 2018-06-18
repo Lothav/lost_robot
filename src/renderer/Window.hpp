@@ -29,8 +29,7 @@ namespace Renderer {
                 name.c_str(),
                 SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                 size[0], size[1],
-                //SDL_WINDOW_FULLSCREEN | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_OPENGL
-                SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_OPENGL
+                SDL_WINDOW_FULLSCREEN | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_OPENGL
             );
 
             if (this->window == nullptr) {

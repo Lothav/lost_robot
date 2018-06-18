@@ -19,9 +19,9 @@ void main()
    	outUV           = vertInUV;
 	gl_Position     = projection * view * model * vec4(vertInPos.xyz, 1.0);
     vec4 pos        = vec4(vertInPos, 1.0);
-	outNormal       = mat3(inverse(transpose(model))) * vertInNormal;
-	vec3 lightPos   = vec3(3.2f, 1.2f, 1.5f);
-	vec3 lPos       = mat3(inverse(transpose(model))) * lightPos.xyz;
+	outNormal       = mat3(inverse(model)) * vertInNormal;
+	vec3 lPos       = eye.xyz;
+	lPos.x          = lPos.x + 3.f;
     outLightVec     = lPos    - pos.xyz;
     outViewVec      = eye.xyz - pos.xyz;
 }

@@ -86,9 +86,11 @@ void Renderer::BulkObject3D::draw(Renderer::Camera *camera)
                 }
             }
 
-            glActiveTexture(GL_TEXTURE0 + textures[mesh->texture_index]);
-            glBindTexture(GL_TEXTURE_2D, textures[mesh->texture_index]);
-            glUniform1i(this->shader_tex_pos_, textures[mesh->texture_index]);
+            if (textures.size() > mesh->texture_index) {
+                glActiveTexture(GL_TEXTURE0 + textures[mesh->texture_index]);
+                glBindTexture(GL_TEXTURE_2D, textures[mesh->texture_index]);
+                glUniform1i(this->shader_tex_pos_, textures[mesh->texture_index]);
+            }
 
             glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
             glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.size()));
