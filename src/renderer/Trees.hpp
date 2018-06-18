@@ -39,7 +39,7 @@ namespace Renderer
             std::array<glm::vec3, 3> trees_pos = {
                     glm::vec3(0.f, 0.2f, 0.f),
                     glm::vec3(1.f, -0.2f, 0.f),
-                    glm::vec3(-.8f, 0.4f, 0.f)
+                    glm::vec3(-1.0f, -1.0f, 0.f),
             };
 
             for (auto tree_pos: trees_pos)
