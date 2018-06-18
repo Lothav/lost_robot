@@ -22,7 +22,7 @@ namespace Renderer
 
         Ground() : Object3D(glm::vec3(0.f))
         {
-            this->importFromFile("./data/environment/SnowTerrain/", "SnowTerrain.dae", {GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB});
+            this->importFromFile("./data/environment/terrain/", "terrain.dae", {GL_RGB, GL_RGB, GL_RGB, GL_RGB, GL_RGB});
             this->transformVertices(glm::scale(glm::mat4(1.0f), glm::vec3(10.f)));
             Renderer::BulkObject3D::getInstance().push_back(this);
 

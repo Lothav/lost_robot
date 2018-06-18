@@ -14,6 +14,7 @@
 
 #include <glm/gtx/norm.hpp>
 #include <random>
+#include <functional>
 
 namespace Renderer
 {
