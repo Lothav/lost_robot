@@ -23,7 +23,7 @@
 #include <sstream>
 
 struct Mesh {
-    std::vector<std::array<GLfloat, 5>> vertices;
+    std::vector<std::array<GLfloat, 8>> vertices;
     GLuint texture_index;
 };
 
@@ -93,17 +93,24 @@ namespace Renderer
 
                             assert(face.mNumIndices == 3);
                             for (int j = 0; j < 3; ++j) {
+
                                 auto pos = mesh->mVertices[face.mIndices[j]];
 
-                                faceObj->vertices[j][0] = mesh->mVertices[face.mIndices[j]][0];
-                                faceObj->vertices[j][1] = mesh->mVertices[face.mIndices[j]][1];
-                                faceObj->vertices[j][2] = mesh->mVertices[face.mIndices[j]][2];
+                                faceObj->vertices[j][0] = pos[0];
+                                faceObj->vertices[j][1] = pos[1];
+                                faceObj->vertices[j][2] = pos[2];
 
                                 aiVector3D uv;
                                 if(mesh->mNumUVComponents[0] > 0) {
                                     uv = mesh->mTextureCoords[0][face.mIndices[j]];
                                 }
-                                meshObj->vertices.push_back({pos.x, pos.y, pos.z, uv.x, uv.y});
+
+                                aiVector3D normal;
+                                normal.x = mesh->mNormals[face.mIndices[j]].x;
+                                normal.y = mesh->mNormals[face.mIndices[j]].y;
+                                normal.z = mesh->mNormals[face.mIndices[j]].z;
+
+                                meshObj->vertices.push_back({pos.x, pos.y, pos.z, uv.x, uv.y, normal.x, normal.y, normal.z});
                             }
                             this->faces_.push_back(faceObj);
                         }

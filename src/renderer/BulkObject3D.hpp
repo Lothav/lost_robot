@@ -29,6 +29,7 @@ namespace Renderer
         Renderer::Shader* shader_;
         GLuint shader_tex_pos_;
         GLuint shader_uv_pos_;
+        GLuint shader_normal_pos_;
         GLuint shader_vert_pos_;
 
         BulkObject3D();

@@ -10,6 +10,7 @@
 #include <array>
 #include "Object3D.hpp"
 #include "Player.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Renderer
 {
@@ -19,7 +20,6 @@ namespace Renderer
 
     private:
 
-        glm::mat4 mvp_;
         glm::mat4 model_;
         glm::mat4 view_;
         glm::mat4 projection_;
@@ -30,20 +30,34 @@ namespace Renderer
         glm::vec3 target_;
         glm::vec3 up_;
 
+        GLuint shader_model_pos_;
         GLuint shader_view_pos_;
+        GLuint shader_projection_pos_;
+        GLuint shader_eye_pos_;
 
         std::array<int, 2> window_size_;
 
     public:
 
         Camera(GLuint shader_program, std::array<int, 2> window_size, glm::vec3 player_pos) :
-                shader_view_pos_(0),
                 window_size_(window_size),
                 player_pos_(player_pos)
         {
-            auto loc = glGetUniformLocation(shader_program, "mvp");
+            auto loc = glGetUniformLocation(shader_program, "model");
+            if (loc < 0) std::cerr << "Can't find 'model' uniform on shader!" << std::endl;
+            this->shader_model_pos_ = static_cast<GLuint>(loc);
+
+            loc = glGetUniformLocation(shader_program, "view");
             if (loc < 0) std::cerr << "Can't find 'view' uniform on shader!" << std::endl;
             this->shader_view_pos_ = static_cast<GLuint>(loc);
+
+            loc = glGetUniformLocation(shader_program, "projection");
+            if (loc < 0) std::cerr << "Can't find 'projection' uniform on shader!" << std::endl;
+            this->shader_projection_pos_ = static_cast<GLuint>(loc);
+
+            loc = glGetUniformLocation(shader_program, "eye");
+            if (loc < 0) std::cerr << "Can't find 'eye' uniform on shader!" << std::endl;
+            this->shader_eye_pos_ = static_cast<GLuint>(loc);
 
             // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
             this->projection_   = glm::perspective(glm::radians(45.0f), (GLfloat)window_size[0] / (GLfloat)window_size[1], 0.1f, 100.0f);
@@ -56,14 +70,15 @@ namespace Renderer
 
             this->adjustRotation();
             this->updateView();
-            this->updateMVP();
         }
 
         void update(Renderer::Object3D *object)
         {
             this->model_ = object->getModelMatrix();
-            this->updateMVP();
-            glUniformMatrix4fv(this->shader_view_pos_, 1, GL_FALSE, &this->mvp_[0][0]);
+            glUniformMatrix4fv(this->shader_model_pos_,      1, GL_FALSE, glm::value_ptr(this->model_));
+            glUniformMatrix4fv(this->shader_view_pos_,       1, GL_FALSE, glm::value_ptr(this->view_));
+            glUniformMatrix4fv(this->shader_projection_pos_, 1, GL_FALSE, glm::value_ptr(this->projection_));
+            glUniform3fv(this->shader_eye_pos_,              1, glm::value_ptr(this->pos_));
         }
 
         void move(glm::vec3 target)
@@ -73,7 +88,6 @@ namespace Renderer
             this->pos_ = this->initial_pos_ + this->player_pos_;
             this->adjustRotation();
             this->updateView();
-            this->updateMVP();
         }
 
         void adjustRotation()
@@ -101,11 +115,6 @@ namespace Renderer
         {
             this->adjustRotation();
             this->view_ = glm::lookAt(pos_, target_, up_);
-        }
-
-        void updateMVP()
-        {
-            this->mvp_ = this->projection_ * this->view_ * this->model_;
         }
 
     };

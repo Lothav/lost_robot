@@ -40,7 +40,7 @@ namespace Renderer
 
         Player *setupPlayer()
         {
-            player_ = new Renderer::Player(glm::vec3(0.f));
+            player_ = new Renderer::Player(glm::vec3(0.f , 0.f, 0.8f));
             player_->importFromFile("./data/players/", "robot_1.fbx", {GL_RGB});
             player_->transformModel(glm::scale(glm::mat4(1.0f), glm::vec3(PLAYER_SCALE)));
             player_->transformVertices(glm::rotate(glm::radians(90.f), glm::vec3(1.f, .0f, .0f)));
